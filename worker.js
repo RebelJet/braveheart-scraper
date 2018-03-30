@@ -1,0 +1,16 @@
+'use strict'
+
+const Queue = require('./lib/Queue');
+const Scraper = require('./lib/Scraper');
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Queue.connect((jobId, payload) => {
+  return Scraper(jobId, payload)
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+process.on('unhandledRejection', err => {
+  console.log('Caught unhandledRejection:', err);
+});
