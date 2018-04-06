@@ -1,0 +1,412 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "RJ Hermes - app",
+
+  "Parameters" : {
+    "SubnetID" : {
+      "Type" : "AWS::EC2::Subnet::Id",
+      "Description" : "The subnet app will use"
+    },
+    "SecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup::Id",
+      "Description" : "Security group id to be associated with the app"
+    },
+    "ECRRepoName" : {
+      "Type" : "String",
+      "Description" : "ECR repo name for loader image",
+      "Default" : "hermes-demo"
+    },
+    "ImageTag" : {
+      "Type" : "String",
+      "Description" : "Image tag for loader image",
+      "Default" : "latest"
+    },
+    "AppTaskCPU": {
+      "Type": "String",
+      "Description": "ECS CPU units allocated to each app task",
+      "Default": "1024"
+    },
+    "AppTaskMEM": {
+      "Type": "String",
+      "Description": "ECS Memory units allocated to each app task",
+      "Default": "993"
+    },
+    "DesiredInstanceCount" : {
+      "Type" : "String",
+      "Description" : "Desired number of workers in the cluster",
+      "AllowedPattern" : "[0-9]+"
+    },
+    "MaxInstanceCount" : {
+      "Type" : "String",
+      "Description" : "Maximum number of workers in the cluster",
+      "AllowedPattern" : "[0-9]+"
+    },
+    "DispatcherHost" : {
+      "Type" : "String",
+      "Description" : "Host that VPN process will connect to",
+      "Default" : "172.17.0.2"
+    },
+    "DispatcherPort" : {
+      "Type" : "Number",
+      "Description" : "The port on the dispatcher host that VPN process will connect to",
+      "Default": 5560
+    },
+    "DispatcherVia" : {
+      "Type" : "String",
+      "Description" : "IP address of the route from the container to the dispatcher",
+      "Default" : "172.17.0.1"
+    },
+    "DispatcherViaDev" : {
+      "Type" : "String",
+      "Description" : "Device associated with the dispatcher via IP",
+      "Default" : "eth0"
+    },
+    "NameServerIP" : {
+      "Type" : "String",
+      "Description" : "IP address of the name server on this subnet"
+    },
+    "VpnUser" : {
+      "Type" : "String",
+      "Description" : "VPN user ID"
+    },
+    "VpnPass" : {
+      "Type" : "String",
+      "Description" : "VPN password"
+    },
+    "InstanceType" : {
+      "Type" : "String",
+      "Description" : "EC2 Instance type for worker",
+      "Default" : "t2.micro"
+    },
+    "TaskCount" : {
+      "Type" : "String",
+      "Description" : "Number of app tasks to run on the cluster",
+      "Default" : "1"
+    },
+    "LogsGroup" : {
+      "Type" : "String",
+      "Description" : "Name of CloudWatch logs group",
+      "Default" : "awslogs-hermes"
+    }
+  },
+  "Resources" : {
+    "AppCluster": {
+      "Type": "AWS::ECS::Cluster",
+      "Properties": {}
+    },
+    "AppTask": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "DependsOn" : "AppInstances",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Name": "app",
+            "Cpu": {"Ref": "AppTaskCPU"},
+            "Essential": "true",
+            "Image": {"Fn::Join": ["",[{"Ref":"AWS::AccountId"},".dkr.ecr.",{"Ref":"AWS::Region"},".amazonaws.com/",{"Ref" : "ECRRepoName"},":",{"Ref":"ImageTag"}]]},
+            "Memory": {"Ref": "AppTaskMEM"},
+            "Privileged" : true,
+            "PortMappings" : [],
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {"Ref" : "LogsGroup"},
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "scraper"
+              }
+            },
+            "WorkingDirectory" : "/app",
+            "EntryPoint": ["/app/runner.sh"],
+            "Command": [
+              {"Ref" : "VpnUser"},
+              {"Ref" : "VpnPass"},
+              {"Ref" : "DispatcherHost"},
+              {"Ref" : "DispatcherPort"},
+              {"Ref" : "DispatcherVia"},
+              {"Ref" : "DispatcherViaDev"},
+              {"Ref" : "NameServerIP"}
+            ]
+          }
+        ]
+      }
+    },
+    "AppASGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": [{ "Ref": "SubnetID" }],
+        "LaunchConfigurationName": { "Ref": "AppInstances" },
+        "MinSize": "0",
+        "MaxSize": {"Ref":"MaxInstanceCount"},
+        "DesiredCapacity": {"Ref":"DesiredInstanceCount"}
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT30M"
+        }
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": "0",
+          "MaxBatchSize": "1",
+          "PauseTime": "PT15M",
+          "WaitOnResourceSignals": "true"
+        }
+      }
+    },
+    "EC2InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "EC2Role"
+          }
+        ]
+      }
+    },
+    "EC2Role": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "ecs-service",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ecs:CreateCluster",
+                    "ecs:DeregisterContainerInstance",
+                    "ecs:DiscoverPollEndpoint",
+                    "ecs:Poll",
+                    "ecs:RegisterContainerInstance",
+                    "ecs:StartTelemetrySession",
+                    "ecs:Submit*",
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:GetDownloadUrlForLayer",
+                    "ecr:GetRepositoryPolicy",
+                    "ecr:DescribeRepositories",
+                    "ecr:ListImages",
+                    "ecr:BatchGetImage",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "s3:ListBucket",
+                    "s3:GetObject",
+                    "s3:*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AppInstances": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": { "Fn::FindInMap": [ "AWSRegionToAMI", { "Ref": "AWS::Region" }, "AMIID" ] },
+        "InstanceType": { "Ref" : "InstanceType" },
+        "KeyName": "rebeljet",
+        "IamInstanceProfile": { "Ref": "EC2InstanceProfile" },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum install -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource AppInstances ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource AppASGroup ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        },
+        "SecurityGroups": [{"Ref":"SecurityGroup"}]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "commands": {
+              "01_add_instance_to_cluster": {
+                "command": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#!/bin/bash\n",
+                      "echo ECS_CLUSTER=",
+                      {
+                        "Ref": "AppCluster"
+                      },
+                      " >> /etc/ecs/ecs.config;echo 'ECS_ENABLE_CONTAINER_METADATA=true' >> /etc/ecs/ecs.config"
+                    ]
+                  ]
+                }
+              }
+            },
+            "files": {
+              "/etc/cfn/cfn-hup.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[main]\n",
+                      "stack=",
+                      {
+                        "Ref": "AWS::StackId"
+                      },
+                      "\n",
+                      "region=",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[cfn-auto-reloader-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.ContainerInstances.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref": "AWS::StackName"
+                      },
+                      "         --resource AppInstances ",
+                      "         --region ",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "cfn-hup": {
+                  "enabled": "true",
+                  "ensureRunning": "true",
+                  "files": [
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "AppService": {
+      "Type": "AWS::ECS::Service",
+      "DependsOn": ["AppASGroup"],
+      "Properties": {
+        "Cluster": {
+          "Ref": "AppCluster"
+        },
+        "TaskDefinition": {
+          "Ref": "AppTask"
+        },
+        "DesiredCount": {"Ref" : "TaskCount"}
+      }
+    },
+    "ServiceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ecs.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "ecs-service",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "elasticloadbalancing:Describe*",
+                    "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                    "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                    "ec2:Describe*",
+                    "ec2:AuthorizeSecurityGroupIngress"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Mappings": {
+      "AWSRegionToAMI": {
+        "us-east-1": {
+          "AMIID" : "ami-ba722dc0"
+        }
+      }
+  }
+}

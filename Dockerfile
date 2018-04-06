@@ -47,7 +47,7 @@ CMD ["google-chrome-stable"]
 ################################################################################
 
 COPY . /app
-RUN chmod a+rx /app/vpn/killAndExit.sh
+RUN chmod a+rx /app/scripts/killAndExit.sh
 RUN chmod a+rx /app/runner.sh
 
 ################################################################################
