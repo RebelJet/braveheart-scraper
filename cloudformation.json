@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "RJ Hermes - app",
+  "Description" : "Braveheart - Scraper",
 
   "Parameters" : {
     "SubnetID" : {
@@ -15,7 +15,7 @@
     "ECRRepoName" : {
       "Type" : "String",
       "Description" : "ECR repo name for loader image",
-      "Default" : "hermes-demo"
+      "Default" : "braveheart-scraper"
     },
     "ImageTag" : {
       "Type" : "String",
@@ -66,14 +66,6 @@
       "Type" : "String",
       "Description" : "IP address of the name server on this subnet"
     },
-    "VpnUser" : {
-      "Type" : "String",
-      "Description" : "VPN user ID"
-    },
-    "VpnPass" : {
-      "Type" : "String",
-      "Description" : "VPN password"
-    },
     "InstanceType" : {
       "Type" : "String",
       "Description" : "EC2 Instance type for worker",
@@ -87,7 +79,7 @@
     "LogsGroup" : {
       "Type" : "String",
       "Description" : "Name of CloudWatch logs group",
-      "Default" : "awslogs-hermes"
+      "Default" : "braveheart"
     }
   },
   "Resources" : {
@@ -119,8 +111,6 @@
             "WorkingDirectory" : "/app",
             "EntryPoint": ["/app/runner.sh"],
             "Command": [
-              {"Ref" : "VpnUser"},
-              {"Ref" : "VpnPass"},
               {"Ref" : "DispatcherHost"},
               {"Ref" : "DispatcherPort"},
               {"Ref" : "DispatcherVia"},
