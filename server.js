@@ -1,6 +1,6 @@
 'use strict'
 
-// process.env.IS_DEBUG_MODE = "true";
+process.env.IS_DEBUG_MODE = "true";
 
 const uuid = require('uuid');
 const restify = require('restify');
