@@ -1,5 +1,5 @@
-const Browser = require('../../Browser');
-const Utils = require('../../Utils');
+const Browser = require('../../lib/Browser');
+const Utils = require('../../lib/Utils');
 
 const UrlHome = 'https://www.flyfrontier.com/plan-and-book/flight-finder/';
 const UrlResults = 'https://booking.flyfrontier.com/Flight/Select';

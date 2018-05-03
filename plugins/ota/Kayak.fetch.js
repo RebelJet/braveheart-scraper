@@ -1,4 +1,4 @@
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 const UrlHome = 'https://www.kayak.com/';
 const UrlResults = 'https://www.kayak.com/flights/';
@@ -7,10 +7,9 @@ const UrlResults = 'https://www.kayak.com/flights/';
 
 let isOnResultsPage = false;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {};
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
     waitUntil: 'domcontentloaded'
   });
 
@@ -23,10 +22,11 @@ module.exports = async function fetch(req, browser) {
   const formId = await page.$eval('.Base-Search-SearchForm', e => e.id);
   const switchId = await page.$eval('.Base-Search-SearchForm .col-switch > div', e => e.id);
 
+  // one-way or roundtrip
   await page.click(`#${switchId}-switch-display`);
-  const switchOption2 = `#${switchId}-switch-option-2`
-  await page.waitForSelector(switchOption2, { visible: true })
-  await page.click(switchOption2);
+  const switchOption = `#${switchId}-switch-option-${req.retDate ? '1' : '2'}`;
+  await page.waitForSelector(switchOption, { visible: true })
+  await page.click(switchOption);
 
   // depAirportCode
   console.log('INSERTING depAirportCode');
@@ -62,32 +62,26 @@ module.exports = async function fetch(req, browser) {
   await page.evaluate(function(selector, value) {
     document.querySelector(selector).value = value;
   }, arrInput, req.arrApt)
-  await Utils.sleep(500);
   const clickElem = `#${formId}-destination-airport-smartbox-dropdown > ul li[data-apicode='${req.arrApt}']`;
-  await page.waitForSelector(clickElem, { visible: true })
+  while (true) {
+    await Utils.sleep(100);
+    const isFound = await page.evaluate(sel => {
+      const elem = document.querySelector(sel)
+      return (elem && elem.offsetParent !== null);
+    }, clickElem);
+    if (isFound) break;
+  }
   console.log('FOUND arrAirportCode clickElem')
   await page.click(clickElem)
 
   // depDate
-  const dateBox = `#${formId}-dateRangeInput-display-start`
-  const dateInput = `#${formId}-depart-input`;
-  await Utils.sleep(500);
-  await page.click(dateBox);
-  await page.waitForSelector(dateInput, { visible: true })
-  await page.click(dateInput);
+  console.log('INSERTING depDate');
+  await insertDate(page, req.depDate, `#${formId}-dateRangeInput-display-start`, `#${formId}-depart-input`)
 
-  while (true) {
-    const depDate = req.depDate.format('MM/DD/YYYY');
-    await page.type(dateInput, depDate)
-    const curValue = await page.evaluate(dateInput => {
-      return document.querySelector(dateInput).innerText;
-    }, dateInput);
-    await Utils.sleep(500);
-    await page.click(dateInput);
-    await page.keyboard.press('Enter');
-    await Utils.sleep(500);
-    if (curValue === depDate) break;
-    console.log(`RETRYING ${dateInput}: `, depDate, curValue);
+  // retDate
+  if (req.retDate) {
+    console.log('INSERTING retDate');
+    await insertDate(page, req.retDate, `#${formId}-dateRangeInput-display-end`, `#${formId}-return-input`)
   }
 
   // do not open comparison windows
@@ -111,9 +105,7 @@ module.exports = async function fetch(req, browser) {
     return (resultsElem && resultsElem.offsetParent);
   }, { polling: 50, timeout: 60000 });
 
-  const html = await page.content()
-
-  return { html, filesByName };
+  return await page.content();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +151,7 @@ const usableResponse = [
   'https://www.kayak.com/s/horizon/flights/results/FlightSearchPoll'
 ]
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -186,13 +178,33 @@ async function addToFiles(response, filesByName) {
         throw err
       }
     }
-    filesByName[prefix] = filesByName[prefix] || [];
-    filesByName[prefix].push(content);
+    addFile(prefix, content);
   //   console.log('--------------------------------------------')
   //   console.log(`  - FOUND ${type} : ${url}`)
   // } else if (!isUsableFile && isOnResultsPage) {
   //   console.log('--------------------------------------------')
   //   console.log(`  - MISSED ${type} : ${url}`)
   //   console.log(body);
+  }
+}
+
+async function insertDate(page, dateValue, dateBox, dateInput) {
+  await Utils.sleep(200);
+  await page.click(dateBox);
+  await page.waitForSelector(dateInput, { visible: true })
+  await page.click(dateInput);
+
+  dateValue = dateValue.format('MM/DD/YYYY');
+  while (true) {
+    await page.type(dateInput, dateValue)
+    const curValue = await page.evaluate(dateInput => {
+      return document.querySelector(dateInput).innerText;
+    }, dateInput);
+    await Utils.sleep(500);
+    await page.click(dateInput);
+    await page.keyboard.press('Enter');
+    await Utils.sleep(500);
+    if (curValue === dateValue) break;
+    console.log(`RETRYING ${dateInput}: `, dateValue, curValue);
   }
 }

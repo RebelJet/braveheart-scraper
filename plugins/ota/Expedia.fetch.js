@@ -1,4 +1,4 @@
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 const UrlHome = 'https://www.expedia.com/';
 const UrlResults = 'https://www.expedia.com/Flights-Search';
@@ -7,10 +7,9 @@ const UrlResults = 'https://www.expedia.com/Flights-Search';
 
 let isOnResultsPage = false;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {};
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
     waitUntil: 'domcontentloaded'
   });
 
@@ -20,27 +19,40 @@ module.exports = async function fetch(req, browser) {
     await page.waitFor('button#tab-flight-tab-hp');
     await page.click('button#tab-flight-tab-hp');
 
-    await page.waitFor('label#flight-type-one-way-label-hp-flight');
-    await page.click('label#flight-type-one-way-label-hp-flight');
+    const tripTypeSel = `label#flight-type-${req.retDate ? 'roundtrip' : 'one-way'}-label-hp-flight`;
+    await page.waitFor(tripTypeSel);
+    await page.click(tripTypeSel);
 
     // depAirportCode
     console.log('INSERTING depAirportCode')
     let inputSel = '.gcw-section-flights-tab input[data-gcw-field-type="origin"]';
-    let optionsSel = '.gcw-section-flights-tab .autocomplete-dropdown ul.results a[data-type="AIRPORT"]';
+    let optionsSel = '.gcw-section-flights-tab .autocomplete-dropdown ul.results a[data-type]';
     await insertAptCode(page, req.depApt, inputSel, optionsSel);
 
     // arrAirportCode
     console.log('INSERTING arrAirportCode')
     inputSel = '.gcw-section-flights-tab input[data-gcw-field-type="destination"]';
-    optionsSel = '.gcw-section-flights-tab .autocomplete-dropdown ul.results a[data-type="AIRPORT"]';
+    optionsSel = '.gcw-section-flights-tab .autocomplete-dropdown ul.results a[data-type]';
     await insertAptCode(page, req.arrApt, inputSel, optionsSel);
 
-    // depDate
-    console.log('INSERTING depDate')
-    const dateInput = `input#flight-departing-single-hp-flight`;
-    await page.$eval(dateInput, (elem) => elem.value = '');
-    await page.click(dateInput);
-    await page.type(dateInput, req.depDate.format('MM/DD/YYYY'))
+    // depDate/retDate
+    const dateDetails = [];
+    if (req.retDate) {
+      console.log('INSERTING depDate and retDate')
+      dateDetails.push([ 'input#flight-returning-hp-flight', req.retDate ]);
+      dateDetails.push([ 'input#flight-departing-hp-flight', req.depDate ]);
+    } else {
+      console.log('INSERTING depDate')
+      dateDetails.push([ 'input#flight-departing-single-hp-flight', req.depDate ]);
+    }
+    for (let dateDetail of dateDetails) {
+      const [ dateInput, dateValue ] = dateDetail;
+      console.log(dateInput, dateValue)
+      await page.$eval(dateInput, (elem) => elem.value = '');
+      await page.click(dateInput);
+      await page.type(dateInput, dateValue.format('MM/DD/YYYY'))
+      await Utils.sleep(100);
+    }
 
     await page.blockImages();
 
@@ -53,11 +65,9 @@ module.exports = async function fetch(req, browser) {
     await page.waitForFunction(function() {
       const progressElem = document.querySelector('.progress-bar');
       return (progressElem && !progressElem.offsetParent);
-    }, { polling: 50, timeout: 10000 });
+    }, { polling: 50, timeout: 30000 });
 
-    const html = await page.content()
-
-    return { html, filesByName };
+    return await page.content();
 
   } catch(err) {
     if (err.page && err.page.title === 'Access Denied') err.details = 'IP_ACCESS_DENIED'
@@ -93,10 +103,11 @@ const throwawayResponse = [
 
 const usableResponse = [
   'https://www.expedia.com/Flight-Search-Paging',
+  'https://www.expedia.com/flight/search',
   // 'https://www.expedia.com/flights/getrichcontent/v4'
 ];
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -113,14 +124,15 @@ async function addToFiles(response, filesByName) {
   } catch(err) {}
   if (isUsableFile && body && isOnResultsPage) {
     const content = JSON.parse(body);
-    filesByName[prefix] = filesByName[prefix] || [];
-    filesByName[prefix].push(content);
+    addFile(prefix, content)
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-  // } else if (!isUsableFile && isOnResultsPage) {
-  //   console.log('--------------------------------------------')
-  //   console.log(`  - ${type} : ${url}`)
-  //   console.log(body);
+    // } else if (!isUsableFile && isOnResultsPage) {
+    //   console.log('--------------------------------------------')
+    //   console.log(`  - ${type} : ${url}`)
+    // const content = JSON.parse(body);
+    // addFile(prefix, content)
+    //   console.log(body);
   }
 }
 
@@ -131,7 +143,7 @@ async function insertAptCode(page, aptCode, inputSel, optionsSel) {
   await page.click(inputSel);
   await Utils.sleep(500);
   await page.keyboard.type(aptCode, {delay: 100})
-  await page.waitFor('.gcw-section-flights-tab .autocomplete-dropdown ul.results a[data-type="AIRPORT"]');
+  await page.waitFor(optionsSel);
 
   page.$$eval(optionsSel, (elems, aptCode, inputSel) => {
     function decode(str) {
@@ -141,6 +153,9 @@ async function insertAptCode(page, aptCode, inputSel, optionsSel) {
     }
     for (var i = 0; i < elems.length; ++i) {
       var elem = elems[i];
+      var type = decode(elem.getAttribute('data-type'));
+      if (!['AIRPORT','METROCODE'].includes(type)) continue;
+
       var value = decode(elem.getAttribute('data-value'));
       var regex = new RegExp(`\\(${aptCode}`);
       if (value.match(regex)) {

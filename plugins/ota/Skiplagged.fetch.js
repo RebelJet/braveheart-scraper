@@ -1,4 +1,4 @@
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 const UrlBase = 'https://skiplagged.com/flights';
 
@@ -6,27 +6,25 @@ const UrlBase = 'https://skiplagged.com/flights';
 
 let isOnResultsPage = true;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {};
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
     waitUntil: 'domcontentloaded'
   });
 
   try {
-    const url = `${UrlBase}/${req.depApt}/${req.arrApt}/${req.depDate.format('YYYY-MM-DD')}`;
+    const dates = [ req.depDate, req.retDate ].filter(d => d).map(d => d.format('YYYY-MM-DD'));
+    const url = `${UrlBase}/${req.depApt}/${req.arrApt}/${dates.join('/')}`;
     const page = await browser.loadPage(url, null);
 
     await page.waitForFunction(function () {
       return !document.querySelector('.spinner').offsetParent
     }, { polling: 50, timeout: 60000 });
 
-    // await Utils.sleep(10000);
-
+    await Utils.sleep(1000);
     console.log('DONE')
-    const html = await page.content();
 
-    return { html, filesByName };
+    return await page.content();
 
   } catch(err) {
     if (err.page && err.page.title === 'Access Denied') err.details = 'IP_ACCESS_DENIED'
@@ -42,7 +40,7 @@ const usableResponse = [
   'https://skiplagged.com/api/search.php'
 ];
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -59,8 +57,7 @@ async function addToFiles(response, filesByName) {
   } catch(err) {}
   if (isUsableFile && body && isOnResultsPage) {
     const content = JSON.parse(body);
-    filesByName[prefix] = filesByName[prefix] || [];
-    filesByName[prefix].push(content);
+    addFile(prefix, content);
     console.log('--------------------------------------------')
     console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile && isOnResultsPage) {

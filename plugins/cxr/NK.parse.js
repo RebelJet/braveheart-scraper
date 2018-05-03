@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 const moment = require('moment');
 
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 ////////////////////////////////////////////////////////////////////////////////
 

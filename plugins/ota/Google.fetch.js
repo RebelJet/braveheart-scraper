@@ -1,24 +1,27 @@
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
-const UrlBase = 'https://www.google.com/flights/beta';
+const UrlBase = 'https://www.google.com/flights';
 
 ////////////////////////////////////////////////////////////////////////////////
 
 let isOnResultsPage = true;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {};
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
   });
 
   try {
-    const url = `${UrlBase}#flt=${req.depApt}.${req.arrApt}.${req.depDate.format('YYYY-MM-DD')};c:USD;e:1;sd:1;t:f;tt:o`;
-    const page = await browser.loadPage(url, null);
-    const html = await page.content();
-    await Utils.sleep(3000);
+    const flts = [ `${req.depApt}.${req.arrApt}.${req.depDate.format('YYYY-MM-DD')}` ]
+    if (req.retDate) flts.push(`${req.arrApt}.${req.depApt}.${req.retDate.format('YYYY-MM-DD')}`)
+    const url = `${UrlBase}#flt=${flts.join('*')};c:USD;e:1;sd:1;t:f${flts.length===1 ? ';tt:o' : ''}`;
 
-    return { html, filesByName };
+    const page = await browser.loadPage(url, null);
+    await Utils.sleep(1000);
+    await page.$eval('.gws-flights-results__dominated-toggle.gws-flights-results__collapsed', el => el ? el.click() : null);
+    await Utils.sleep(9000);
+
+    return await page.content();;
 
   } catch(err) {
     if (err.page && err.page.title === 'Access Denied') err.details = 'IP_ACCESS_DENIED'
@@ -32,7 +35,7 @@ const usableResponse = [
   'https://www.google.com/async/flights/search',
 ];
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -43,8 +46,7 @@ async function addToFiles(response, filesByName) {
   const body = await response.text();
   if (isUsableFile && body && isOnResultsPage) {
     const content = JSON.parse(body.replace(/^\)]}'/, '').trim());
-    filesByName[prefix] = filesByName[prefix] || [];
-    filesByName[prefix].push(content);
+    addFile(prefix, content);
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile) {

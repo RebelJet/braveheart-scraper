@@ -1,6 +1,6 @@
 const moment = require('moment');
 
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 const UrlHome = 'https://www.kiwi.com/us/search';
 const UrlResults = 'https://www.kiwi.com/us/search/';
@@ -9,10 +9,9 @@ const UrlResults = 'https://www.kiwi.com/us/search/';
 
 let isOnResultsPage = false;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {}
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
     waitUntil: 'domcontentloaded'
   });
 
@@ -23,33 +22,50 @@ module.exports = async function fetch(req, browser) {
     console.log('CLEARING FIELDS')
     await clearAptField(page, 'origin');
     await clearAptField(page, 'destination');
-    await Utils.sleep(1000);
+    await Utils.sleep(500);
 
-    console.log('INSERTING DATE')
-    await selectDate(page, req.depDate)
-    await Utils.sleep(1000);
+    // oneway or roundtrip
+    if (req.retDate) {
+      console.log('SET ROUNDTRIP')
+      await page.click('.SearchFormModesPicker-scrollContainer .RadioButtonsOption:nth-child(1)')
+    } else {
+      console.log('SET ONEWAY')
+      await page.click('.SearchFormModesPicker-scrollContainer .RadioButtonsOption:nth-child(2)')
+    }
 
-    console.log('INSERTING ORIGIN')
+    console.log('INSERTING depDate')
+    await selectDate(page, req.depDate, '.SearchDateField.outboundDate', 'outboundDate')
+    await Utils.sleep(200);
+
+    if (req.retDate) {
+      console.log('INSERTING retDate')
+      await selectDate(page, req.retDate, '.SearchDateField.inboundDate', 'inboundDate')
+      await Utils.sleep(200);
+    }
+
+    console.log('INSERTING depApt')
     await insertAptCode(page, 'origin', req.depApt);
-    await Utils.sleep(1000);
+    await Utils.sleep(100);
 
-    console.log('INSERTING DESTINATION')
+    console.log('INSERTING arrApt')
     await insertAptCode(page, 'destination', req.arrApt);
 
     isOnResultsPage = true;
     console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
     await page.resultsPageIsLoaded(true);
+    await Utils.sleep(2000);
 
     await page.waitForFunction(function() {
+      const normalResults = document.querySelector('.NormalResults')
+      if (!normalResults) return false
+      const loadingLine = document.querySelector('.NormalResults .LoadingLine')
+      if (loadingLine) return false;
+
       const loadingBar = document.querySelector('.NormalResults .LoadingBar')
-      return (!loadingBar || loadingBar.className.includes('is-active')) ? false : true;
+      return (loadingBar && loadingBar.className.includes('is-active')) ? false : true;
     }, { polling: 50, timeout: 60000 });
 
-    const html = await page.content()
-    console.log('DONE!!!!!')
-    await Utils.sleep(5000);
-
-    return { html, filesByName };
+    return await page.content()
 
   } catch(err) {
     if (err.page && err.page.title === 'Access Denied') err.details = 'IP_ACCESS_DENIED'
@@ -64,7 +80,7 @@ const usableResponse = [
   // 'https://meta-searches.skypicker.com/search'
 ];
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -75,8 +91,7 @@ async function addToFiles(response, filesByName) {
   const body = await response.text();
   if (isUsableFile && body && isOnResultsPage) {
     const content = JSON.parse(body);
-    filesByName[prefix] = filesByName[prefix] || [];
-    filesByName[prefix].push(content);
+    addFile(prefix, content);
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile) {
@@ -87,25 +102,29 @@ async function addToFiles(response, filesByName) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-async function selectDate(page, reqDate) {
-  await page.click('.SearchDateField.outboundDate');
-  await page.evaluate(() => {
+async function selectDate(page, reqDate, inputSel, modalClass) {
+  await page.click(inputSel);
+  await page.evaluate((inputSel, modalClass) => {
     return new Promise((resolve, reject) => {
       (function checkCalendar() {
-        const calendar = document.querySelector('.PickerCalendarFrame .calendar-view .Calendar');
-        if (calendar) return resolve()
-
-        const destinationPicker = document.querySelector('.ModalPicker.destination');
-        if (destinationPicker) document.querySelector('.SearchDateField.outboundDate').click();
-
+        const modalPicker = document.querySelector('.ModalPicker');
+        if (modalPicker && !modalPicker.classList.contains(modalClass)) {
+          console.log('clicking on ', inputSel)
+          document.querySelector(inputSel).click();
+        } else if (!modalPicker) {
+          console.log('clicking on ', inputSel)
+          document.querySelector(inputSel).click();
+        } else {
+          const calendar = document.querySelector('.PickerCalendarFrame .calendar-view .Calendar .Calendar-month');
+          if (calendar) return resolve()
+        }
         console.log('waiting for calendar');
         setTimeout(checkCalendar, 100);
       })();
     });
-  })
+  }, inputSel, modalClass)
 
   const months = Array(12).fill(null).map((v,i) => moment().add(i,'month').format('MMMM YYYY'))
-  console.log('MONTHS: ', months)
   page.evaluate((months, reqDate, reqDay) => {
     return new Promise((resolve, reject) => {
       const reqIndex = months.indexOf(reqDate);
@@ -148,9 +167,13 @@ async function clearAptField(page, type) {
 async function insertAptCode(page, type, aptCode) {
   await clearAptField(page, type);
   await Utils.sleep(100);
+  await page.click(`input.input-${type}`);
   await page.type(`input.input-${type}`, aptCode);
-  const optionsSelector = `.PlacePicker .Places .places-list .place-row.clickable`;
+  const optionsSelector = `.PlacePicker-content .PlacePicker-places .places-list .PlacePickerRow.clickable`;
+  console.log('waiting for optionsSelector');
   await page.waitFor(optionsSelector);
+
+  console.log('evaluating optionsSelector')
   await page.evaluate(function(optionsSelector, aptCode) {
     return new Promise((resolve, reject) => {
       const modeAll = document.querySelector(`.PlacePicker .ModalPickerMenu .mode-all`);
@@ -160,8 +183,8 @@ async function insertAptCode(page, type, aptCode) {
         const elems = document.querySelectorAll(optionsSelector);
         for (var i = 0; i < elems.length; ++i) {
           var elem = elems[i];
-          if (!elem.querySelector('.place-icon.ic_flight') && !elem.querySelector('.ic_add_circle')) continue;
-          const text = elem.querySelector('.name .main').innerText.trim();
+          if (!elem.querySelector('.ic_flight') && !elem.querySelector('.ic_add_circle')) continue;
+          const text = elem.querySelector('.PlacePickerRow-name').innerText.trim();
           if (elem.getAttribute('tabindex') === aptCode || text.match(regex)) {
             elem.click();
             return resolve();

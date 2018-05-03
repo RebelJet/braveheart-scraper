@@ -1,5 +1,5 @@
-const Browser = require('../../Browser');
-const Utils = require('../../Utils');
+const Browser = require('../../lib/Browser');
+const Utils = require('../../lib/Utils');
 
 const UrlHome = 'https://www.spirit.com/Default.aspx';
 const UrlResults = 'https://www.spirit.com/DPPCalendarMarket.aspx';

@@ -1,12 +1,12 @@
 const moment = require('moment-timezone');
 
-const Utils = require('../../Utils');
-const Airports = require('../../common/Airports');
+const Utils = require('../../lib/Utils');
+const Airports = require('../../lib/common/Airports');
 
-const Itinerary = require('../../models/Itinerary');
-const Leg = require('../../models/Leg');
-const Segment = require('../../models/Segment');
-const Layover = require('../../models/Layover');
+const Itinerary = require('../../lib/models/Itinerary');
+const Leg = require('../../lib/models/Leg');
+const Segment = require('../../lib/models/Segment');
+const Layover = require('../../lib/models/Layover');
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,9 +18,9 @@ module.exports = function parse(req) {
   Object.keys(filesByName).forEach(name => {
     const files = filesByName[name];
     files.forEach((file,i) => {
-      console.log(`PARSING ${name}/${i}`)
-      const data = extractDataFromFile(depDate, file);
-      extractItinerariesFromData(data, { depDate }).forEach(itinerary => {
+      console.log(`PARSING ${name} :: ${i}`)
+      const data = extractDataFromFile(file);
+      extractItinerariesFromData(data, req).forEach(itinerary => {
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;
         if (itinerary.legs[0].arrAirportCode !== req.arrApt) return;
@@ -33,7 +33,7 @@ module.exports = function parse(req) {
   return itineraries.sort((a,b) => a.price - b.price);
 }
 
-function extractDataFromFile(depDate, file) {
+function extractDataFromFile(file) {
   const raw = {
     junk: file._r[0],
     junk: file._r[1],
@@ -61,20 +61,21 @@ function extractItinerariesFromData(data, req) {
     if (!rawPrice) return;
 
     const price = parseInt(flight[0][6].replace(/[^0-9.]+/g, '')) * 100;
-    const leg = extractLegFromTmpLeg(flight[0], req);
-    itineraries.push(new Itinerary([leg], price));
+    const legs = extractLegsFromTmpItinerary(flight[0], req);
+    itineraries.push(new Itinerary(legs, price));
   });
   return itineraries;
 }
 
-function extractLegFromTmpLeg(tmpLeg, req) {
+function extractLegsFromTmpItinerary(tmpLeg, req) {
+  const legs = [];
   const tmpRoutes = tmpLeg[4];
   const tmpStopovers = tmpLeg[5] || [];
 
   const depRoute = tmpRoutes[0];
   const depAirportCode = depRoute[0];
 
-  const depDate = req.depDate;
+  const depDate = req.depDate.format('YYYY-MM-DD');
   const depTime = depRoute[3][0];
 
   const dateTimes = Utils.calculateDateTimeForSegs({ depAirportCode, depDate, depTime }, tmpRoutes.map((route, i) => {
@@ -109,5 +110,13 @@ function extractLegFromTmpLeg(tmpLeg, req) {
     })
   })
 
-  return new Leg(segments, layovers);
+  legs.push(new Leg(segments, layovers));
+  if (req.retDate) legs.push({
+    depAirportCode: legs[0].arrAirportCode,
+    depDate: req.retDate.format('YYYY-MM-DD'),
+    arrAirportCode: legs[0].depAirportCode,
+    requiresFetch: true
+  })
+
+  return legs;
 }

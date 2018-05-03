@@ -1,11 +1,11 @@
 const moment = require('moment-timezone');
 
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
-const Itinerary = require('../../models/Itinerary');
-const Leg = require('../../models/Leg');
-const Segment = require('../../models/Segment');
-const Layover = require('../../models/Layover');
+const Itinerary = require('../../lib/models/Itinerary');
+const Leg = require('../../lib/models/Leg');
+const Segment = require('../../lib/models/Segment');
+const Layover = require('../../lib/models/Layover');
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@ module.exports = function parse(req) {
   Object.keys(filesByName).forEach(name => {
     const files = filesByName[name];
     files.forEach((file,i) => {
-      console.log(`PARSING ${name}/${i}`)
+      console.log(`PARSING ${name} :: ${i}`)
       extractItinerariesFromFile(file).forEach(itinerary => {
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;

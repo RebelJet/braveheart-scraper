@@ -1,4 +1,4 @@
-const Utils = require('../../Utils');
+const Utils = require('../../lib/Utils');
 
 const UrlBase = 'https://www.wego.com/flights/searches';
 
@@ -6,14 +6,14 @@ const UrlBase = 'https://www.wego.com/flights/searches';
 
 let isOnResultsPage = true;
 
-module.exports = async function fetch(req, browser) {
-  const filesByName = {};
+module.exports = async function fetch(req, browser, addFile) {
   browser.config({
-    async onResponse(res) { await addToFiles(res, filesByName) },
+    async onResponse(res) { await processFiles(res, addFile) },
   });
 
   try {
-    const url = `${UrlBase}/c${req.depApt}-c${req.arrApt}/${req.depDate.format('YYYY-MM-DD')}/economy/1a:0c:0i?sort=price&order=asc`;
+    const dates = [ req.depDate, req.retDate ].filter(d => d).map(d => d.format('YYYY-MM-DD'));
+    const url = `${UrlBase}/c${req.depApt}-c${req.arrApt}/${dates.join(':')}/economy/1a:0c:0i?sort=price&order=asc`;
     const page = await browser.loadPage(url, null);
 
     await page.waitForFunction(function() {
@@ -31,9 +31,7 @@ module.exports = async function fetch(req, browser) {
       }
     }, { polling: 100, timeout: 60000 });
 
-    const html = await extractFullContent(page);
-
-    return { html, filesByName };
+    return await extractFullContent(page);
 
   } catch(err) {
     if (err.page && err.page.title === 'Access Denied') err.details = 'IP_ACCESS_DENIED'
@@ -60,7 +58,7 @@ const usableResponse = [
   'https://srv.wego.com/v2/metasearch/flights/searches/'
 ]
 
-async function addToFiles(response, filesByName) {
+async function processFiles(response, addFile) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -78,8 +76,7 @@ async function addToFiles(response, filesByName) {
   if (isUsableFile && body && isOnResultsPage) {
     try {
       const content = JSON.parse(body);
-      filesByName[prefix] = filesByName[prefix] || [];
-      filesByName[prefix].push(content);
+      addFile(prefix, content);
     } catch(err) { }
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
