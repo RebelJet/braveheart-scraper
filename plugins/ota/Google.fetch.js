@@ -7,7 +7,7 @@ const UrlBase = 'https://www.google.com/flights';
 module.exports = async function fetch(req, browser, addFile) {
   const status = { isOnResultsPage: false };
   browser.config({
-    async onResponse(res) { await processFiles(res, addFile) },
+    async onResponse(res) { await processFiles(res, addFile, status) },
   });
 
   try {
