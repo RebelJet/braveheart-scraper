@@ -13,7 +13,6 @@ module.exports = function parse(req) {
   const itineraries = [];
   const filesByName = req.data.filesByName;
   const depDate = req.depDate.format('YYYY-MM-DD');
-
   Object.keys(filesByName).forEach(name => {
     const files = filesByName[name];
     files.forEach((file,i) => {

@@ -5,11 +5,10 @@ const UrlResults = 'https://www.expedia.com/Flights-Search';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let isOnResultsPage = false;
-
 module.exports = async function fetch(req, browser, addFile) {
+  const status = { isOnResultsPage: false };
   browser.config({
-    async onResponse(res) { await processFiles(res, addFile) },
+    async onResponse(res) { await processFiles(res, addFile, status) },
     waitUntil: 'domcontentloaded'
   });
 
@@ -56,7 +55,7 @@ module.exports = async function fetch(req, browser, addFile) {
 
     await page.blockImages();
 
-    isOnResultsPage = true;
+    status.isOnResultsPage = true;
     console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
     await page.keyboard.press('Enter');
     await page.resultsPageIsLoaded(true);
@@ -107,7 +106,7 @@ const usableResponse = [
   // 'https://www.expedia.com/flights/getrichcontent/v4'
 ];
 
-async function processFiles(response, addFile) {
+async function processFiles(response, addFile, status) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -122,12 +121,12 @@ async function processFiles(response, addFile) {
   try {
     body = await response.text();
   } catch(err) {}
-  if (isUsableFile && body && isOnResultsPage) {
+  if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body);
     addFile(prefix, content)
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-    // } else if (!isUsableFile && isOnResultsPage) {
+    // } else if (!isUsableFile && status.isOnResultsPage) {
     //   console.log('--------------------------------------------')
     //   console.log(`  - ${type} : ${url}`)
     // const content = JSON.parse(body);

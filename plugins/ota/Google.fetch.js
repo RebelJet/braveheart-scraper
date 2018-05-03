@@ -4,9 +4,8 @@ const UrlBase = 'https://www.google.com/flights';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let isOnResultsPage = true;
-
 module.exports = async function fetch(req, browser, addFile) {
+  const status = { isOnResultsPage: false };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile) },
   });
@@ -35,7 +34,7 @@ const usableResponse = [
   'https://www.google.com/async/flights/search',
 ];
 
-async function processFiles(response, addFile) {
+async function processFiles(response, addFile, status) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -44,7 +43,7 @@ async function processFiles(response, addFile) {
   if (!['script','xhr'].includes(type)) return;
   const isUsableFile = usableResponse.some(prefix => url.includes(prefix));
   const body = await response.text();
-  if (isUsableFile && body && isOnResultsPage) {
+  if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body.replace(/^\)]}'/, '').trim());
     addFile(prefix, content);
     // console.log('--------------------------------------------')

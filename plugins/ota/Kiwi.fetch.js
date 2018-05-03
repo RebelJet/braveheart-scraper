@@ -7,11 +7,10 @@ const UrlResults = 'https://www.kiwi.com/us/search/';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let isOnResultsPage = false;
-
 module.exports = async function fetch(req, browser, addFile) {
+  const status = { isOnResultsPage: false };
   browser.config({
-    async onResponse(res) { await processFiles(res, addFile) },
+    async onResponse(res) { await processFiles(res, addFile, status) },
     waitUntil: 'domcontentloaded'
   });
 
@@ -50,7 +49,7 @@ module.exports = async function fetch(req, browser, addFile) {
     console.log('INSERTING arrApt')
     await insertAptCode(page, 'destination', req.arrApt);
 
-    isOnResultsPage = true;
+    status.isOnResultsPage = true;
     console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
     await page.resultsPageIsLoaded(true);
     await Utils.sleep(2000);
@@ -80,7 +79,7 @@ const usableResponse = [
   // 'https://meta-searches.skypicker.com/search'
 ];
 
-async function processFiles(response, addFile) {
+async function processFiles(response, addFile, status) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -89,7 +88,7 @@ async function processFiles(response, addFile) {
   if (!['script','xhr'].includes(type)) return;
   const isUsableFile = usableResponse.some(prefix => url.includes(prefix));
   const body = await response.text();
-  if (isUsableFile && body && isOnResultsPage) {
+  if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body);
     addFile(prefix, content);
     // console.log('--------------------------------------------')

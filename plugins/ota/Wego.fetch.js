@@ -4,11 +4,10 @@ const UrlBase = 'https://www.wego.com/flights/searches';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let isOnResultsPage = true;
-
 module.exports = async function fetch(req, browser, addFile) {
+  const status = { isOnResultsPage: false };
   browser.config({
-    async onResponse(res) { await processFiles(res, addFile) },
+    async onResponse(res) { await processFiles(res, addFile, status) },
   });
 
   try {
@@ -58,7 +57,7 @@ const usableResponse = [
   'https://srv.wego.com/v2/metasearch/flights/searches/'
 ]
 
-async function processFiles(response, addFile) {
+async function processFiles(response, addFile, status) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -73,14 +72,14 @@ async function processFiles(response, addFile) {
   try {
     body = await response.text();
   } catch(err) {}
-  if (isUsableFile && body && isOnResultsPage) {
+  if (isUsableFile && body && status.isOnResultsPage) {
     try {
       const content = JSON.parse(body);
       addFile(prefix, content);
     } catch(err) { }
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-  // } else if (!isUsableFile && isOnResultsPage) {
+  // } else if (!isUsableFile && status.isOnResultsPage) {
   //   console.log('--------------------------------------------')
   //   console.log(`  - ${type} : ${url}`)
   //   console.log(body);

@@ -9,12 +9,10 @@ const UrlResults = [
 
 ////////////////////////////////////////////////////////////////////////////////
 
-let isOnResultsPage = false;
-let hasSavedFiles = false;
-
 module.exports = async function fetch(req, browser, addFile) {
+  const status = { isOnResultsPage: false, hasSavedFiles: false }
   browser.config({
-    async onResponse(res) { await processFiles(res, addFile) },
+    async onResponse(res) { await processFiles(res, addFile, status) },
   });
 
   try {
@@ -39,15 +37,15 @@ module.exports = async function fetch(req, browser, addFile) {
 
     await page.blockImages();
 
-    isOnResultsPage = true;
+    status.isOnResultsPage = true;
     console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
     await page.click('#jb-booking-form-submit-button');
     await page.resultsPageIsLoaded(false);
-    while (!hasSavedFiles) {
+
+    while (!status.hasSavedFiles) {
       await Utils.sleep(100);
     }
 
-    console.log('FINISHED!')
     return await page.content()
 
   } catch(err) {
@@ -64,7 +62,7 @@ const usableResponse = [
   'https://www.southwest.com/api/air-booking/v1/air-booking/page/air/booking/shopping'
 ];
 
-async function processFiles(response, addFile) {
+async function processFiles(response, addFile, status) {
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -79,13 +77,13 @@ async function processFiles(response, addFile) {
   try {
     body = await response.text();
   } catch(err) {}
-  if (isUsableFile && body && isOnResultsPage) {
+  if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body);
     addFile(prefix, content);
-    hasSavedFiles = true;
+    status.hasSavedFiles = true;
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-  // } else if (!isUsableFile && isOnResultsPage) {
+  // } else if (!isUsableFile && status.isOnResultsPage) {
   //   console.log('--------------------------------------------')
   //   console.log(`  - ${type} : ${url}`)
   //   const content = JSON.parse(body);
