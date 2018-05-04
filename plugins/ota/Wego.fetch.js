@@ -5,7 +5,7 @@ const UrlBase = 'https://www.wego.com/flights/searches';
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetch(req, browser, addFile) {
-  const status = { isOnResultsPage: false };
+  const status = { isOnResultsPage: true };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },
   });
@@ -49,8 +49,7 @@ const throwawayResponse = [
   'https://srv.wego.com/places/locations',
   'https://securepubads.g.doubleclick.net',
   'https://tr.brand-display.com/',
-  'https://cdn.brand-display.com',
-
+  'https://cdn.brand-display.com'
 ]
 
 const usableResponse = [

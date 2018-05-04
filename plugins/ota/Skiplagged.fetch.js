@@ -5,7 +5,7 @@ const UrlBase = 'https://skiplagged.com/flights';
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetch(req, browser, addFile) {
-  const status = { isOnResultsPage: false };
+  const status = { isOnResultsPage: true, hasSavedFiles: false };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },
     waitUntil: 'domcontentloaded'
@@ -16,11 +16,13 @@ module.exports = async function fetch(req, browser, addFile) {
     const url = `${UrlBase}/${req.depApt}/${req.arrApt}/${dates.join('/')}`;
     const page = await browser.loadPage(url, null);
 
+    while (!status.hasSavedFiles) {
+      await Utils.sleep(100);
+    }
     await page.waitForFunction(function () {
       return !document.querySelector('.spinner').offsetParent
     }, { polling: 50, timeout: 60000 });
 
-    await Utils.sleep(1000);
     console.log('DONE')
 
     return await page.content();
@@ -57,8 +59,9 @@ async function processFiles(response, addFile, status) {
   if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body);
     addFile(prefix, content);
-    console.log('--------------------------------------------')
-    console.log(`  - ${type} : ${url}`)
+    status.hasSavedFiles = true;
+    // console.log('--------------------------------------------')
+    // console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile && status.isOnResultsPage) {
   //   console.log('--------------------------------------------')
   //   console.log(`  - ${type} : ${url}`)

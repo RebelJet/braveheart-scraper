@@ -5,7 +5,7 @@ const UrlBase = 'https://www.google.com/flights';
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetch(req, browser, addFile) {
-  const status = { isOnResultsPage: false };
+  const status = { isOnResultsPage: true, hasSavedFiles: false }
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },
   });
@@ -17,9 +17,12 @@ module.exports = async function fetch(req, browser, addFile) {
 
     const page = await browser.loadPage(url, null);
     await Utils.sleep(1000);
+    status.hasSavedFiles = false;
     await page.$eval('.gws-flights-results__dominated-toggle.gws-flights-results__collapsed', el => el ? el.click() : null);
-    await Utils.sleep(9000);
-
+    while (!status.hasSavedFiles) {
+      await Utils.sleep(100);
+    }
+    await Utils.sleep(5000);
     return await page.content();;
 
   } catch(err) {
@@ -46,6 +49,8 @@ async function processFiles(response, addFile, status) {
   if (isUsableFile && body && status.isOnResultsPage) {
     const content = JSON.parse(body.replace(/^\)]}'/, '').trim());
     addFile(prefix, content);
+    status.hasSavedFiles = true;
+
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile) {
