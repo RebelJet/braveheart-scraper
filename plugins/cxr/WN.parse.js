@@ -89,7 +89,7 @@ function extractCheapestPrice(fareProducts) {
   let price;
   Object.values(fareProducts).forEach(fareProduct => {
     Object.values(fareProduct).forEach(fprod => {
-      if (fprod.availabilityStatus === 'UNAVAILABLE') return;
+      if (['UNAVAILABLE','SOLD_OUT'].includes(fprod.availabilityStatus)) return;
       const p = parseFloat(fprod.fare.totalFare.value);
       if (!price || price > p) price = p;
     });
