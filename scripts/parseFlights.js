@@ -5,7 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const moment = require('moment');
 
-const filepath = path.resolve(__dirname, '../html/CXR-WN-ATL-PHL-2018-05-26-2018-05-30');
+const filepath = path.resolve(__dirname, '../html/OTA-Skiplagged-ATL-SEA-2018-06-08-2018-06-13');
 const PluginBase = require('../lib/Plugins');
 
 async function run() {
@@ -21,6 +21,7 @@ async function run() {
   const flights = Parse(req);
 
   flights.slice(0).forEach(flight => {
+    if (!flight.legs[0].flightNumbers.includes(951)) return;
     console.log('------------------------------------');
     // console.log(flight.legs[0].carriers.join('-'), (flight.price + 0) / 100);
     console.log(JSON.stringify(flight, null, 2));

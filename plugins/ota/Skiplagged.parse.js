@@ -68,7 +68,7 @@ function extractLegsFromTmpFlight(tmpFlight, req) {
       arrAirportCode: tmpSegment.arrival.airport,
       arrDate: moment(tmpSegment.arrival.time).format('YYYY-MM-DD'),
       arrTime: moment(tmpSegment.arrival.time).format('HH:mm'),
-      durationMinutes: tmpSegment.duration,
+      durationMinutes: Math.round(tmpSegment.duration / 60),
     }));
   })
 
