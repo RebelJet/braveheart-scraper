@@ -55,13 +55,13 @@ module.exports = async function fetch(req, browser, addFile) {
     await Utils.sleep(2000);
 
     await page.waitForFunction(function() {
-      const normalResults = document.querySelector('.NormalResults')
-      if (!normalResults) return false
-      const loadingLine = document.querySelector('.NormalResults .LoadingLine')
-      if (loadingLine) return false;
+      const resultsElem = document.querySelector('.Results')
+      if (!resultsElem) return false
+      const loadingLineElem = document.querySelector('.Results .LoadingLine')
+      if (loadingLineElem) return false;
 
-      const loadingBar = document.querySelector('.NormalResults .LoadingBar')
-      return (loadingBar && loadingBar.className.includes('is-active')) ? false : true;
+      const loadingBarElem = document.querySelector('.Results .LoadingBar')
+      return (loadingBarElem && loadingBarElem.className.includes('is-active')) ? false : true;
     }, { polling: 50, timeout: 60000 });
 
     return await page.content()
@@ -165,9 +165,9 @@ async function clearAptField(page, type) {
 
 async function insertAptCode(page, type, aptCode) {
   await clearAptField(page, type);
-  await Utils.sleep(100);
+  await Utils.sleep(400);
   await page.click(`input.input-${type}`);
-  await page.type(`input.input-${type}`, aptCode);
+  await page.type(`input.input-${type}`, aptCode, { delay: 100 });
   const optionsSelector = `.PlacePicker-content .PlacePicker-places .places-list .PlacePickerRow.clickable`;
   console.log('waiting for optionsSelector');
   await page.waitFor(optionsSelector);
@@ -176,12 +176,14 @@ async function insertAptCode(page, type, aptCode) {
   await page.evaluate(function(optionsSelector, aptCode) {
     return new Promise((resolve, reject) => {
       const modeAll = document.querySelector(`.PlacePicker .ModalPickerMenu .mode-all`);
+      // console.log('modeAll: ', modeAll);
       if (modeAll) modeAll.click();
       (function checkElems() {
         const regex = new RegExp(`^${aptCode}`);
         const elems = document.querySelectorAll(optionsSelector);
         for (var i = 0; i < elems.length; ++i) {
           var elem = elems[i];
+          // console.log('elem: ', elem)
           if (!elem.querySelector('.ic_flight') && !elem.querySelector('.ic_add_circle')) continue;
           const text = elem.querySelector('.PlacePickerRow-name').innerText.trim();
           if (elem.getAttribute('tabindex') === aptCode || text.match(regex)) {
