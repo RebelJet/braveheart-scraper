@@ -20,9 +20,6 @@ module.exports = function parse(req) {
     files.forEach((file,i) => {
       console.log(`PARSING ${name} :: ${i}`)
       extractItinerariesFromFile(file).forEach(itinerary => {
-        // console.log('-----------------------')
-        // console.log(itinerary.legs[0].depAirportCode == req.depApt, itinerary.legs[0].arrAirportCode == req.arrApt, itinerary)
-
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;
         if (itinerary.legs[0].arrAirportCode !== req.arrApt) return;
@@ -38,9 +35,9 @@ function extractItinerariesFromFile(file) {
   const itineraries = [];
 
   file.data.get_flights.data.forEach(tmpItin => {
-    const price = Math.round((tmpItin.conversion.EUR * 1.24) * 100)
+    const price = extractPrice(tmpItin);
     const legs = extractLegsFromTmpItinerary(tmpItin);
-    if (legs.length) itineraries.push(new Itinerary(legs, price));
+    if (price && legs.length) itineraries.push(new Itinerary(legs, price));
   });
   return itineraries;
 }
@@ -101,4 +98,12 @@ function extractLegsFromTmpItinerary(tmpItin) {
   })
 
   return legs;
+}
+
+function extractPrice(tmpItin) {
+  let conversion = tmpItin.conversion[0];
+  if (!conversion) return;
+  let price = tmpItin.conversion[0].value;
+  if (tmpItin.conversion.currency === 'EUR') price = price * 1.18; // TODO: dynamically load exchange rate
+  return Math.round(price * 100)
 }
