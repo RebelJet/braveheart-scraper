@@ -1,10 +1,7 @@
 const Utils = require('../../lib/Utils');
 
-const UrlHome = 'https://www.southwest.com/';
+const UrlHome = 'https://www.jetblue.com/#/';
 const UrlResults = [
-  'https://www.southwest.com/air/booking/select.html',
-  'https://www.southwest.com/flight/select-flight.html',
-  'https://www.southwest.com/flight/search-flight.html?error'
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,33 +15,35 @@ module.exports = async function fetch(req, browser, addFile) {
   try {
     const page = await browser.loadPage(UrlHome, UrlResults);
 
-    const tripTypeSel = req.retDate ? '#trip-type-round-trip' : '#trip-type-one-way'
+    const tripTypeSel = req.retDate ? '#RT' : '#OW';
     await page.waitFor(tripTypeSel);
     await page.click(tripTypeSel);
+    await Utils.sleep(100);
 
     console.log('INSERTING depApt')
-    await insertAptCode(page, '#air-city-departure', req.depApt);
+    await insertApt(page, 'input[placeholder="Where from?"]', req.depApt);
 
     console.log('INSERTING arrApt')
-    await insertAptCode(page, '#air-city-arrival', req.arrApt);
+    await insertApt(page, 'input[placeholder="Where to?"]', req.arrApt);
 
     console.log('INSERTING depDate');
-    await insertDate(page, '#air-date-departure', req.depDate);
+    await insertDate(page, 'input[name^="departure-date_"]', req.depDate);
+
     if (req.retDate) {
       console.log('INSERTING retDate');
-      await insertDate(page, '#air-date-return', req.retDate);
+      await insertDate(page, 'input[name^="return-date_"]', req.retDate);
     }
-
+    await Utils.sleep(100);
     await page.blockImages();
 
     status.isOnResultsPage = true;
     console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
-    await page.click('#jb-booking-form-submit-button');
+    await page.$eval('button.bg-orange[type="button"]', button => button.click());
     await page.resultsPageIsLoaded(false);
 
-    while (!status.hasSavedFiles) {
-      await Utils.sleep(100);
-    }
+    // while (!status.hasSavedFiles) {
+    //   await Utils.sleep(100);
+    // }
 
     return await page.content()
 
@@ -53,6 +52,30 @@ module.exports = async function fetch(req, browser, addFile) {
     throw err;
   }
 }
+
+async function insertApt(page, inputSel, inputVal) {
+  await page.$eval(inputSel, (elem) => elem.value = '');
+  await Utils.sleep(200);
+  await page.click(inputSel);
+  await page.type(inputSel, inputVal);
+  await page.$eval(inputSel, (elem, inputVal) => {
+    const airportElems = elem.parentElement.parentElement.parentElement.querySelectorAll('.suggestion-list ul li.airport-suggestion');
+    for (let elem of airportElems) {
+      const textElem = elem.querySelector('span span:nth-child(2)');
+      if (!textElem || textElem.innerText !== inputVal) continue;
+      elem.click();
+      break;
+    }
+  }, inputVal);
+}
+
+async function insertDate(page, inputSel, date) {
+  const inputVal = date.format('MM/DD/YYYY');
+  await page.$eval(inputSel, (elem) => elem.value = '');
+  await Utils.sleep(100);
+  await page.type(inputSel, inputVal);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -83,30 +106,11 @@ async function processFiles(response, addFile, status) {
     status.hasSavedFiles = true;
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-  // } else if (!isUsableFile && status.isOnResultsPage) {
-  //   console.log('--------------------------------------------')
-  //   console.log(`  - ${type} : ${url}`)
-  //   console.log(body);
+  } else if (!isUsableFile && status.isOnResultsPage) {
+    console.log('--------------------------------------------')
+    console.log(`  - ${type} : ${url}`)
+    console.log(body);
   //   const content = JSON.parse(body);
   //   addFile(prefix, content)
-  }
-}
-
-async function insertAptCode(page, inputSel, inputValue) {
-  await page.click(inputSel);
-  await page.type(inputSel, '');
-  await page.type(inputSel, inputValue);
-}
-
-async function insertDate(page, inputSel, inputValue) {
-  inputValue = inputValue.format('MM/DD');
-  while (true) {
-    await page.click(inputSel);
-    await page.$eval(inputSel, elem => elem.value = '')
-    await page.type(inputSel, inputValue);
-    const curValue = await page.evaluate(inputSel => {
-      return document.querySelector(inputSel).value;
-    }, inputSel);
-    if (curValue === inputValue) break;
   }
 }

@@ -51,7 +51,6 @@
 //         arrTime: arrTime,
 //         arrDate: Utils.calculateArrDate(this.depDate.format('YYYY-MM-DD'), depTime, arrTime),
 //         flightNumbers: flightNumbers,
-//         flightIds: flightNumbers, // ToDo: remove this once SearchAPI has been updated.
 //         numStops: rows.length - 1,
 //         segments: [],
 //       }
@@ -62,7 +61,6 @@
 //         const segment = {
 //           cxr: CXR,
 //           flightNumber: flightNumber,
-//           flightId: flightNumber, // ToDo: remove this
 //           // depApt: extractDepApt($segment),
 //           // depTime: Utils.extractTime($segment.find('.flightTime.departDetails').text().trim().replace(/[^0-9a-z:]/gi,'')),
 //           // depDate: this.depDate.format('YYYY-MM-DD'),

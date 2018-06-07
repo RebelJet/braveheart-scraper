@@ -1,0 +1,1166 @@
+{
+  "id": 1,
+  "fastest": false,
+  "lowestFare": false,
+  "fare": [
+    {
+      "miscFlightInfos": [
+        {
+          "airlineFltInfo": {
+            "airline": {
+              "airlineCode": "DL",
+              "airlineName": "Delta Air Lines"
+            },
+            "flightNbr": "1793"
+          },
+          "bookingCode": "E",
+          "cabinNameInfo": [
+            {
+              "destination": "DEN",
+              "id": "BE",
+              "origin": "ATL"
+            }
+          ],
+          "displayBookingCode": "E",
+          "upgradeDetailByLegs": [
+            {
+              "upgradeDetails": []
+            }
+          ],
+          "upgradeInfoByLegs": []
+        }
+      ],
+      "fareId": 1,
+      "refundable": false,
+      "lowestFare": false,
+      "discountAvailable": false,
+      "webPriceAvailable": false,
+      "changeable": false,
+      "seatsAvailableCount": 9,
+      "fareRulesCode": [
+        "ATLDEN*LATVA0BA"
+      ],
+      "ticketDesignator": [
+        ""
+      ],
+      "specialFareRulesCode": [],
+      "segmentNbrFareRulesCode": [],
+      "tax": [],
+      "totalTaxAndFees": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 29.13,
+          "decimalPrecision": 2,
+          "formattedAmount": "29.13",
+          "numericPart": "29",
+          "fractionalPart": "13"
+        }
+      },
+      "basePrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 199.07,
+          "decimalPrecision": 2,
+          "formattedAmount": "199.07",
+          "numericPart": "199",
+          "fractionalPart": "07"
+        }
+      },
+      "salesPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 199.07,
+          "decimalPrecision": 2,
+          "formattedAmount": "199.07",
+          "numericPart": "199",
+          "fractionalPart": "07"
+        }
+      },
+      "totalPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 228.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "228.20",
+          "numericPart": "228",
+          "fractionalPart": "20"
+        }
+      },
+      "totalPriceByPTC": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 228.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "228.20",
+          "numericPart": "228",
+          "fractionalPart": "20"
+        }
+      },
+      "fareCalcLine": "ATL DL DEN199.07LATVA0BA USD199.07END ZP ATL XF ATL4.5",
+      "paxInfo": {
+        "type": "ADT",
+        "count": 1
+      },
+      "endorsement": [
+        {
+          "carrier": {
+            "code": "",
+            "name": ""
+          },
+          "extendedFareCode": "LATVA0BA",
+          "text": "1-NONREF++",
+          "originAirportCode": "ATL",
+          "destAirportCode": "DEN"
+        }
+      ],
+      "totalPaxPrice": [
+        {
+          "currency": {
+            "code": "USD",
+            "currencySymbol": "&#36;",
+            "amount": 228.2,
+            "decimalPrecision": 2,
+            "formattedAmount": "228.20",
+            "numericPart": "228",
+            "fractionalPart": "20"
+          }
+        }
+      ],
+      "fareRulesByFareBreak": [],
+      "fareRestrictionByFlightSeg": [],
+      "groupId": "0",
+      "currencySymbol": "&#36;",
+      "seatSelectable": false,
+      "upgradeAvailable": false,
+      "showUpgradeEligible": false,
+      "offered": true,
+      "soldOut": false,
+      "multipleCos": false,
+      "multipleProducts": false,
+      "multipleCabins": false,
+      "payWithMilesEligible": false,
+      "upsell": false,
+      "selected": true,
+      "mixAndMatch": false,
+      "dominantSegmentBrandId": "BE",
+      "solutionId": "kPepbfo4CTpUBEYpJ0SsUc/w9B0SsUcmv3ccQqouzQBEaEWE/0bGZlLcbAglTQHleOL76is3/8cyjRmuwxXJPiJ2SimfDXO004/BASIC-ECONOMY",
+      "brandByFlightLeg": [
+        {
+          "flightSegmentId": 1,
+          "flightLegId": 1,
+          "brandId": "BE",
+          "brandName": "Basic Economy",
+          "tripId": 1,
+          "cos": "E",
+          "deltaProduct": true,
+          "dominantLeg": true,
+          "upgradeOption": [],
+          "product": {
+            "priceableIn": [],
+            "product": [
+              {
+                "id": "AM0CL3",
+                "typeCode": "Amenity",
+                "iataServiceCode": "57",
+                "shortDesc": "2KU Wi-Fi",
+                "priority": 3,
+                "productIconId": "twoku",
+                "tagLine": "In-flight High-speed Internet access available for purchase.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change. Available globally where coverage exists. Requires payment by credit card for activation.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_24_hour_wifi@3x.png"
+              },
+              {
+                "id": "AM02QX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "55",
+                "shortDesc": "USB Power",
+                "priority": 6,
+                "productIconId": "usb",
+                "tagLine": "Power your phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_usb_power_icon@3x.png"
+              },
+              {
+                "id": "AM02PX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "54",
+                "shortDesc": "110V AC Power",
+                "priority": 5,
+                "productIconId": "110",
+                "tagLine": "Power your laptop, phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_ac_power@3x.png"
+              },
+              {
+                "id": "AM02OX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "15",
+                "shortDesc": "Personal Entertainment",
+                "priority": 7,
+                "productIconId": "ent",
+                "tagLine": "Movies, TV shows, games, music and more - on demand.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_personal_ent_icon@3x.png"
+              },
+              {
+                "id": "AM02RX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "5",
+                "shortDesc": "Live Satellite TV",
+                "priority": 10,
+                "productIconId": "stv",
+                "tagLine": "18 free channels from DISH Network.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_satellite_icon@2x.png"
+              }
+            ]
+          },
+          "isBasicEconomy": "true",
+          "displayFareDetailsPopup": "true"
+        }
+      ]
+    },
+    {
+      "miscFlightInfos": [
+        {
+          "airlineFltInfo": {
+            "airline": {
+              "airlineCode": "DL",
+              "airlineName": "Delta Air Lines"
+            },
+            "flightNbr": "1793"
+          },
+          "bookingCode": "L",
+          "cabinNameInfo": [
+            {
+              "destination": "DEN",
+              "id": "MAIN",
+              "origin": "ATL"
+            }
+          ],
+          "displayBookingCode": "L",
+          "upgradeDetailByLegs": [
+            {
+              "upgradeDetails": []
+            }
+          ],
+          "upgradeInfoByLegs": []
+        }
+      ],
+      "fareId": 2,
+      "refundable": false,
+      "lowestFare": false,
+      "discountAvailable": false,
+      "webPriceAvailable": false,
+      "changeable": true,
+      "seatsAvailableCount": 5,
+      "fareRulesCode": [
+        "ATLDEN*LATVA0MB"
+      ],
+      "ticketDesignator": [
+        ""
+      ],
+      "specialFareRulesCode": [],
+      "segmentNbrFareRulesCode": [],
+      "tax": [],
+      "totalTaxAndFees": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 30.87,
+          "decimalPrecision": 2,
+          "formattedAmount": "30.87",
+          "numericPart": "30",
+          "fractionalPart": "87"
+        }
+      },
+      "basePrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 222.33,
+          "decimalPrecision": 2,
+          "formattedAmount": "222.33",
+          "numericPart": "222",
+          "fractionalPart": "33"
+        }
+      },
+      "salesPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 222.33,
+          "decimalPrecision": 2,
+          "formattedAmount": "222.33",
+          "numericPart": "222",
+          "fractionalPart": "33"
+        }
+      },
+      "totalPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 253.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "253.20",
+          "numericPart": "253",
+          "fractionalPart": "20"
+        }
+      },
+      "totalPriceByPTC": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 253.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "253.20",
+          "numericPart": "253",
+          "fractionalPart": "20"
+        }
+      },
+      "fareCalcLine": "ATL DL DEN222.33LATVA0MB USD222.33END ZP ATL XF ATL4.5",
+      "paxInfo": {
+        "type": "ADT",
+        "count": 1
+      },
+      "endorsement": [
+        {
+          "carrier": {
+            "code": "",
+            "name": ""
+          },
+          "extendedFareCode": "LATVA0MB",
+          "text": "1-NONREF++3-BEFORE-DEPARTURE+3-AFTER-DEPARTURE+",
+          "originAirportCode": "ATL",
+          "destAirportCode": "DEN"
+        }
+      ],
+      "totalPaxPrice": [
+        {
+          "currency": {
+            "code": "USD",
+            "currencySymbol": "&#36;",
+            "amount": 253.2,
+            "decimalPrecision": 2,
+            "formattedAmount": "253.20",
+            "numericPart": "253",
+            "fractionalPart": "20"
+          }
+        }
+      ],
+      "fareRulesByFareBreak": [],
+      "fareRestrictionByFlightSeg": [],
+      "groupId": "0",
+      "currencySymbol": "&#36;",
+      "seatSelectable": true,
+      "upgradeAvailable": true,
+      "showUpgradeEligible": false,
+      "offered": true,
+      "soldOut": false,
+      "multipleCos": false,
+      "multipleProducts": false,
+      "multipleCabins": false,
+      "payWithMilesEligible": false,
+      "upsell": false,
+      "selected": true,
+      "mixAndMatch": false,
+      "dominantSegmentBrandId": "MAIN",
+      "solutionId": "kPepbfo4CTpUBEYpJ0SsUc/w9B0SsUcmv3ccQqouzQBEaEWE/0bGZlLcbAglTQHleOL76is3/ZyXrNMGjeFAVY2wcTtjrVL004/ECONOMY",
+      "brandByFlightLeg": [
+        {
+          "flightSegmentId": 1,
+          "flightLegId": 1,
+          "brandId": "MAIN",
+          "brandName": "Main Cabin",
+          "tripId": 1,
+          "cos": "L",
+          "deltaProduct": true,
+          "dominantLeg": true,
+          "upgradeOption": [],
+          "product": {
+            "priceableIn": [],
+            "product": [
+              {
+                "id": "AM0CL3",
+                "typeCode": "Amenity",
+                "iataServiceCode": "57",
+                "shortDesc": "2KU Wi-Fi",
+                "priority": 3,
+                "productIconId": "twoku",
+                "tagLine": "In-flight High-speed Internet access available for purchase.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change. Available globally where coverage exists. Requires payment by credit card for activation.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_24_hour_wifi@3x.png"
+              },
+              {
+                "id": "AM02QX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "55",
+                "shortDesc": "USB Power",
+                "priority": 6,
+                "productIconId": "usb",
+                "tagLine": "Power your phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_usb_power_icon@3x.png"
+              },
+              {
+                "id": "AM02PX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "54",
+                "shortDesc": "110V AC Power",
+                "priority": 5,
+                "productIconId": "110",
+                "tagLine": "Power your laptop, phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_ac_power@3x.png"
+              },
+              {
+                "id": "AM02OX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "15",
+                "shortDesc": "Personal Entertainment",
+                "priority": 7,
+                "productIconId": "ent",
+                "tagLine": "Movies, TV shows, games, music and more - on demand.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_personal_ent_icon@3x.png"
+              },
+              {
+                "id": "AM02RX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "5",
+                "shortDesc": "Live Satellite TV",
+                "priority": 10,
+                "productIconId": "stv",
+                "tagLine": "18 free channels from DISH Network.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_satellite_icon@2x.png"
+              }
+            ]
+          },
+          "isBasicEconomy": "false",
+          "displayFareDetailsPopup": "false"
+        }
+      ]
+    },
+    {
+      "miscFlightInfos": [
+        {
+          "airlineFltInfo": {
+            "airline": {
+              "airlineCode": "DL",
+              "airlineName": "Delta Air Lines"
+            },
+            "flightNbr": "1793"
+          },
+          "bookingCode": "W",
+          "cabinNameInfo": [
+            {
+              "destination": "DEN",
+              "id": "DCP",
+              "origin": "ATL"
+            }
+          ],
+          "displayBookingCode": "W",
+          "upgradeDetailByLegs": [
+            {
+              "upgradeDetails": []
+            }
+          ],
+          "upgradeInfoByLegs": []
+        }
+      ],
+      "fareId": 3,
+      "refundable": false,
+      "lowestFare": false,
+      "discountAvailable": false,
+      "webPriceAvailable": false,
+      "changeable": true,
+      "seatsAvailableCount": 7,
+      "fareRulesCode": [
+        "ATLDEN*LATVA0CB"
+      ],
+      "ticketDesignator": [
+        ""
+      ],
+      "specialFareRulesCode": [],
+      "segmentNbrFareRulesCode": [],
+      "tax": [],
+      "totalTaxAndFees": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 35.34,
+          "decimalPrecision": 2,
+          "formattedAmount": "35.34",
+          "numericPart": "35",
+          "fractionalPart": "34"
+        }
+      },
+      "basePrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 281.86,
+          "decimalPrecision": 2,
+          "formattedAmount": "281.86",
+          "numericPart": "281",
+          "fractionalPart": "86"
+        }
+      },
+      "salesPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 281.86,
+          "decimalPrecision": 2,
+          "formattedAmount": "281.86",
+          "numericPart": "281",
+          "fractionalPart": "86"
+        }
+      },
+      "totalPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 317.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "317.20",
+          "numericPart": "317",
+          "fractionalPart": "20"
+        }
+      },
+      "totalPriceByPTC": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 317.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "317.20",
+          "numericPart": "317",
+          "fractionalPart": "20"
+        }
+      },
+      "fareCalcLine": "ATL DL DEN281.86LATVA0CB USD281.86END ZP ATL XF ATL4.5",
+      "paxInfo": {
+        "type": "ADT",
+        "count": 1
+      },
+      "endorsement": [
+        {
+          "carrier": {
+            "code": "",
+            "name": ""
+          },
+          "extendedFareCode": "LATVA0CB",
+          "text": "1-NONREF++3-BEFORE-DEPARTURE+3-AFTER-DEPARTURE+",
+          "originAirportCode": "ATL",
+          "destAirportCode": "DEN"
+        }
+      ],
+      "totalPaxPrice": [
+        {
+          "currency": {
+            "code": "USD",
+            "currencySymbol": "&#36;",
+            "amount": 317.2,
+            "decimalPrecision": 2,
+            "formattedAmount": "317.20",
+            "numericPart": "317",
+            "fractionalPart": "20"
+          }
+        }
+      ],
+      "fareRulesByFareBreak": [],
+      "fareRestrictionByFlightSeg": [],
+      "groupId": "0",
+      "currencySymbol": "&#36;",
+      "seatSelectable": true,
+      "upgradeAvailable": true,
+      "showUpgradeEligible": false,
+      "offered": true,
+      "soldOut": false,
+      "multipleCos": false,
+      "multipleProducts": false,
+      "multipleCabins": false,
+      "payWithMilesEligible": false,
+      "upsell": false,
+      "selected": true,
+      "mixAndMatch": false,
+      "dominantSegmentBrandId": "DCP",
+      "solutionId": "kPepbfo4CTpUBEYpJ0SsUc/w9B0SsUcmv3ccQqouzQBEaEWE/0bGZlLcbAglTQHleOL76is3/LqmjSqc0IkIU47KN93ls3O004/COMFORT-PLUS",
+      "brandByFlightLeg": [
+        {
+          "flightSegmentId": 1,
+          "flightLegId": 1,
+          "brandId": "DCP",
+          "brandName": "Delta Comfort+&#174;",
+          "tripId": 1,
+          "cos": "W",
+          "deltaProduct": true,
+          "dominantLeg": true,
+          "upgradeOption": [],
+          "product": {
+            "priceableIn": [],
+            "product": [
+              {
+                "id": "AM0CL3",
+                "typeCode": "Amenity",
+                "iataServiceCode": "57",
+                "shortDesc": "2KU Wi-Fi",
+                "priority": 3,
+                "productIconId": "twoku",
+                "tagLine": "In-flight High-speed Internet access available for purchase.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change. Available globally where coverage exists. Requires payment by credit card for activation.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_24_hour_wifi@3x.png"
+              },
+              {
+                "id": "AM02QX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "55",
+                "shortDesc": "USB Power",
+                "priority": 6,
+                "productIconId": "usb",
+                "tagLine": "Power your phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_usb_power_icon@3x.png"
+              },
+              {
+                "id": "AM02PX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "54",
+                "shortDesc": "110V AC Power",
+                "priority": 5,
+                "productIconId": "110",
+                "tagLine": "Power your laptop, phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_ac_power@3x.png"
+              },
+              {
+                "id": "AM02OX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "15",
+                "shortDesc": "Personal Entertainment",
+                "priority": 7,
+                "productIconId": "ent",
+                "tagLine": "Movies, TV shows, games, music and more - on demand.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_personal_ent_icon@3x.png"
+              },
+              {
+                "id": "AM02RX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "5",
+                "shortDesc": "Live Satellite TV",
+                "priority": 10,
+                "productIconId": "stv",
+                "tagLine": "18 free channels from DISH Network.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_satellite_icon@2x.png"
+              }
+            ]
+          },
+          "isBasicEconomy": "false",
+          "displayFareDetailsPopup": "false"
+        }
+      ]
+    },
+    {
+      "miscFlightInfos": [
+        {
+          "airlineFltInfo": {
+            "airline": {
+              "airlineCode": "DL",
+              "airlineName": "Delta Air Lines"
+            },
+            "flightNbr": "1793"
+          },
+          "bookingCode": "A",
+          "cabinNameInfo": [
+            {
+              "destination": "DEN",
+              "id": "FIRST",
+              "origin": "ATL"
+            }
+          ],
+          "displayBookingCode": "A",
+          "upgradeDetailByLegs": [
+            {
+              "upgradeDetails": []
+            }
+          ],
+          "upgradeInfoByLegs": []
+        }
+      ],
+      "fareId": 4,
+      "refundable": false,
+      "lowestFare": false,
+      "discountAvailable": false,
+      "webPriceAvailable": false,
+      "changeable": true,
+      "seatsAvailableCount": 5,
+      "fareRulesCode": [
+        "ATLDEN*LATVA0FB"
+      ],
+      "ticketDesignator": [
+        ""
+      ],
+      "specialFareRulesCode": [],
+      "segmentNbrFareRulesCode": [],
+      "tax": [],
+      "totalTaxAndFees": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 43.71,
+          "decimalPrecision": 2,
+          "formattedAmount": "43.71",
+          "numericPart": "43",
+          "fractionalPart": "71"
+        }
+      },
+      "basePrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 393.49,
+          "decimalPrecision": 2,
+          "formattedAmount": "393.49",
+          "numericPart": "393",
+          "fractionalPart": "49"
+        }
+      },
+      "salesPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 393.49,
+          "decimalPrecision": 2,
+          "formattedAmount": "393.49",
+          "numericPart": "393",
+          "fractionalPart": "49"
+        }
+      },
+      "totalPrice": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 437.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "437.20",
+          "numericPart": "437",
+          "fractionalPart": "20"
+        }
+      },
+      "totalPriceByPTC": {
+        "currency": {
+          "code": "USD",
+          "currencySymbol": "&#36;",
+          "amount": 437.2,
+          "decimalPrecision": 2,
+          "formattedAmount": "437.20",
+          "numericPart": "437",
+          "fractionalPart": "20"
+        }
+      },
+      "fareCalcLine": "ATL DL DEN393.49LATVA0FB USD393.49END ZP ATL XF ATL4.5",
+      "paxInfo": {
+        "type": "ADT",
+        "count": 1
+      },
+      "endorsement": [
+        {
+          "carrier": {
+            "code": "",
+            "name": ""
+          },
+          "extendedFareCode": "LATVA0FB",
+          "text": "1-NONREF++3-BEFORE-DEPARTURE+3-AFTER-DEPARTURE+",
+          "originAirportCode": "ATL",
+          "destAirportCode": "DEN"
+        }
+      ],
+      "totalPaxPrice": [
+        {
+          "currency": {
+            "code": "USD",
+            "currencySymbol": "&#36;",
+            "amount": 437.2,
+            "decimalPrecision": 2,
+            "formattedAmount": "437.20",
+            "numericPart": "437",
+            "fractionalPart": "20"
+          }
+        }
+      ],
+      "fareRulesByFareBreak": [],
+      "fareRestrictionByFlightSeg": [],
+      "groupId": "2",
+      "currencySymbol": "&#36;",
+      "seatSelectable": true,
+      "upgradeAvailable": false,
+      "showUpgradeEligible": false,
+      "offered": true,
+      "soldOut": false,
+      "multipleCos": false,
+      "multipleProducts": false,
+      "multipleCabins": false,
+      "payWithMilesEligible": false,
+      "upsell": false,
+      "selected": true,
+      "mixAndMatch": false,
+      "dominantSegmentBrandId": "FIRST",
+      "solutionId": "kPepbfo4CTpUBEYpJ0SsUc/w9B0SsUcmv3ccQqouzQBEaEWE/0bGZlLcbAglTQHleOL76is3/W6w8BIs0l39OAqSHt19fUI003/BUSINESS-FIRST",
+      "brandByFlightLeg": [
+        {
+          "flightSegmentId": 1,
+          "flightLegId": 1,
+          "brandId": "FIRST",
+          "brandName": "First Class",
+          "tripId": 1,
+          "cos": "A",
+          "deltaProduct": true,
+          "dominantLeg": true,
+          "upgradeOption": [],
+          "product": {
+            "priceableIn": [],
+            "product": [
+              {
+                "id": "AM0CL3",
+                "typeCode": "Amenity",
+                "iataServiceCode": "57",
+                "shortDesc": "2KU Wi-Fi",
+                "priority": 3,
+                "productIconId": "twoku",
+                "tagLine": "In-flight High-speed Internet access available for purchase.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change. Available globally where coverage exists. Requires payment by credit card for activation.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_24_hour_wifi@3x.png"
+              },
+              {
+                "id": "AM02QX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "55",
+                "shortDesc": "USB Power",
+                "priority": 6,
+                "productIconId": "usb",
+                "tagLine": "Power your phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_usb_power_icon@3x.png"
+              },
+              {
+                "id": "AM02PX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "54",
+                "shortDesc": "110V AC Power",
+                "priority": 5,
+                "productIconId": "110",
+                "tagLine": "Power your laptop, phone or tablet at your seat.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_ac_power@3x.png"
+              },
+              {
+                "id": "AM02OX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "15",
+                "shortDesc": "Personal Entertainment",
+                "priority": 7,
+                "productIconId": "ent",
+                "tagLine": "Movies, TV shows, games, music and more - on demand.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_personal_ent_icon@3x.png"
+              },
+              {
+                "id": "AM02RX",
+                "typeCode": "Amenity",
+                "iataServiceCode": "5",
+                "shortDesc": "Live Satellite TV",
+                "priority": 10,
+                "productIconId": "stv",
+                "tagLine": "18 free channels from DISH Network.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_satellite_icon@2x.png"
+              },
+              {
+                "id": "AMG21X",
+                "typeCode": "Amenity",
+                "iataServiceCode": "6",
+                "shortDesc": "Sky Priority",
+                "priority": 11,
+                "productIconId": "sky",
+                "tagLine": "Expedited check-in, boarding and baggage delivery.",
+                "priceableIn": [],
+                "product": [],
+                "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+                "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_sky_priority_icon@3x.png"
+              }
+            ]
+          },
+          "isBasicEconomy": "false",
+          "displayFareDetailsPopup": "false"
+        }
+      ]
+    }
+  ],
+  "trip": [
+    {
+      "id": 1,
+      "schedDepartLocalTs": "2018-06-22T08:24",
+      "tripDepartureDateOutbound": "Fri, 22 June 2018",
+      "tripDepartureTime": "8:24AM",
+      "tripArrivalDate": "Fri 22 Jun",
+      "tripArrivalTime": "9:34AM",
+      "schedArrivalLocalTs": "2018-06-22T09:34",
+      "originAirportCode": "ATL",
+      "originCity": "Atlanta, GA",
+      "destAirportCode": "DEN",
+      "destCity": "Denver, CO",
+      "stopCount": 0,
+      "nearByAirport": false,
+      "differentDepartureAirport": false,
+      "flightSegment": [
+        {
+          "id": 1,
+          "dayChange": false,
+          "pendingGovtApproval": false,
+          "dominantSegment": true,
+          "stopCount": 0,
+          "originAirportCode": "ATL",
+          "originCity": "Atlanta, GA",
+          "destAirportCode": "DEN",
+          "destCity": "Denver, CO",
+          "schedDepartLocalTs": "2018-06-22T08:24",
+          "schedArrivalLocalTs": "2018-06-22T09:34",
+          "marketingFlightNum": "1793",
+          "marketingCos": "",
+          "totalAirTime": {
+            "hour": 3,
+            "minute": 10,
+            "day": 0
+          },
+          "aircraft": {
+            "fleetTypeCode": "739",
+            "newSubFleetType": false
+          },
+          "marketingCarrier": {
+            "code": "DL",
+            "name": "Delta Air Lines"
+          },
+          "ticketingTimeLimitUtcTs": "2018-06-06T23:59-07:00",
+          "flightLeg": [
+            {
+              "id": 1,
+              "redEye": false,
+              "dayChange": false,
+              "dominantLeg": true,
+              "originAirportCode": "ATL",
+              "originCity": "Atlanta",
+              "destAirportCode": "DEN",
+              "destCity": "Denver",
+              "schedDepartLocalTs": "2018-06-22T08:24",
+              "schedArrivalLocalTs": "2018-06-22T09:34",
+              "duration": {
+                "hour": 3,
+                "minute": 10,
+                "day": 0
+              },
+              "marketingCarrier": {
+                "code": "DL",
+                "name": "Delta Air Lines"
+              },
+              "operatingCarrier": {
+                "code": "DL",
+                "name": "Delta Air Lines"
+              },
+              "distance": {
+                "unit": "MI",
+                "measure": 1196
+              },
+              "aircraft": {
+                "fleetTypeCode": "739",
+                "fleetName": "Boeing 737-900ER ",
+                "newSubFleetType": false
+              },
+              "onTimePerformance": {
+                "unit": "PCT",
+                "measure": 90
+              },
+              "feeRestricted": false,
+              "operatedByOwnerAirline": true,
+              "viewSeatUrl": {
+                "fltNumber": "DL1793",
+                "originCityCode": "ATL",
+                "fltIndex": "1",
+                "triggerSourceId": "SHOPPING",
+                "currencyCode": "USD",
+                "hasBusFirst": false,
+                "viewSeatActionURL": "/seat/RetrieveLSMAction?",
+                "seatsURLParameters": [
+                  {
+                    "airlineCode": "DL",
+                    "operatingAirline": "DL",
+                    "flightNumber": "1793",
+                    "departureCity": "ATL",
+                    "departureDate": "22 Jun 2018",
+                    "departureTime": "08 24 A",
+                    "arrivalCity": "DEN",
+                    "arrivalDate": "22 Jun 2018",
+                    "arrivalTime": "09 34 A",
+                    "classOfService": "T"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "totalTripTime": {
+        "hour": 3,
+        "minute": 10,
+        "day": 0
+      },
+      "summarizedProducts": [
+        {
+          "id": "AM0CL3",
+          "shortDesc": "2KU Wi-Fi",
+          "productIconId": "twoku",
+          "tagLine": "In-flight High-speed Internet access available for purchase.",
+          "disclaimer": "In-Flight services and amenities may vary and are subject to change. Available globally where coverage exists. Requires payment by credit card for activation.",
+          "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_24_hour_wifi@3x.png"
+        },
+        {
+          "id": "AM02QX",
+          "shortDesc": "USB Power",
+          "productIconId": "usb",
+          "tagLine": "Power your phone or tablet at your seat.",
+          "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+          "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_usb_power_icon@3x.png"
+        },
+        {
+          "id": "AM02PX",
+          "shortDesc": "110V AC Power",
+          "productIconId": "110",
+          "tagLine": "Power your laptop, phone or tablet at your seat.",
+          "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+          "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/amenity_ac_power@3x.png"
+        },
+        {
+          "id": "AM02OX",
+          "shortDesc": "Personal Entertainment",
+          "productIconId": "ent",
+          "tagLine": "Movies, TV shows, games, music and more - on demand.",
+          "disclaimer": "In-Flight services and amenities may vary and are subject to change.",
+          "imageURL": "//content.delta.com/content/dam/delta-content-api/sprites/mobile/flight_amenity_personal_ent_icon@3x.png"
+        }
+      ],
+      "viewSeatUrls": [
+        {
+          "fltIndex": "1",
+          "triggerSourceId": "SHOPPING",
+          "currencyCode": "USD",
+          "hasBusFirst": false,
+          "viewSeatActionURL": "/seat/RetrieveLSMAction?",
+          "seatsURLParameters": [
+            {
+              "airlineCode": "DL",
+              "operatingAirline": "DL",
+              "flightNumber": "1793",
+              "departureCity": "ATL",
+              "departureDate": "22 Jun 2018",
+              "departureTime": "08 24 A",
+              "arrivalCity": "DEN",
+              "arrivalDate": "22 Jun 2018",
+              "arrivalTime": "09 34 A",
+              "classOfService": "T"
+            }
+          ]
+        }
+      ],
+      "newSubFleetType": false,
+      "dominantFlightLeg": {
+        "dominantFlightIndex": 0,
+        "dominantLegIndex": 0
+      }
+    }
+  ],
+  "links": [
+    {
+      "rel": "flightSpecificBrand",
+      "href": "/flight/brands",
+      "payload": {
+        "legList": [
+          {
+            "destinationAirportCode": "DEN",
+            "originAirportCode": "ATL",
+            "classOfServiceSlugList": [
+              {
+                "BE-revenue": "E"
+              },
+              {
+                "MAIN-revenue": "L"
+              },
+              {
+                "DCP-revenue": "W"
+              },
+              {
+                "FIRST-revenue": "A"
+              }
+            ],
+            "airlineCode": "DL",
+            "schedLocalDepartDate": "2018-06-22",
+            "flightNumber": "1793"
+          }
+        ],
+        "appID": "mobile",
+        "destinationCities": [
+          "Denver"
+        ],
+        "pageID": "pageID",
+        "channelID": "mobile"
+      }
+    }
+  ]
+},

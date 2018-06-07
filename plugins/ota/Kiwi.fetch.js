@@ -76,10 +76,12 @@ module.exports = async function fetch(req, browser, addFile) {
 
 const usableResponse = [
   'https://api.skypicker.com/flights',
+  'https://r-umbrella-app.skypicker.com/graphql'
   // 'https://meta-searches.skypicker.com/search'
 ];
 
 async function processFiles(response, addFile, status) {
+  if (!status.isOnResultsPage) return;
   const request = response.request();
   const type = request.resourceType();
   const url = response.url();
@@ -88,14 +90,15 @@ async function processFiles(response, addFile, status) {
   if (!['script','xhr'].includes(type)) return;
   const isUsableFile = usableResponse.some(prefix => url.includes(prefix));
   const body = await response.text();
-  if (isUsableFile && body && status.isOnResultsPage) {
+  if (isUsableFile && body) {
     const content = JSON.parse(body);
     addFile(prefix, content);
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
-  // } else if (!isUsableFile) {
-  //   console.log('--------------------------------------------')
-  //   console.log(`  - ${type} : ${url}`)
+  } else if (!isUsableFile) {
+    console.log('--------------------------------------------')
+    console.log(`  - ${type} : ${url}`)
+    // console.log(body)
   }
 }
 

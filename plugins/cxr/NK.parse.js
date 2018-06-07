@@ -3,80 +3,86 @@ const moment = require('moment');
 
 const Utils = require('../../lib/Utils');
 
+const Itinerary = require('../../lib/models/Itinerary');
+const Leg = require('../../lib/models/Leg');
+const Segment = require('../../lib/models/Segment');
+const Layover = require('../../lib/models/Layover');
+
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = function parse(req) {
-  const flights = [];
-  const $ = cheerio.load(req.html);
+  const itineraries = [];
+  const depDate = req.depDate.format('YYYY-MM-DD');
+
+  extractItinerariesFromHtml(req.data.html, req).forEach(itinerary => {
+    if (itinerary.legs[0].depDate !== depDate) return;
+    if (itinerary.legs[0].depAirportCode !== req.depApt) return;
+    if (itinerary.legs[0].arrAirportCode !== req.arrApt) return;
+    itineraries.push(itinerary)
+  });
+
+  return itineraries.sort((a,b) => a.price - b.price);
+}
+
+function extractItinerariesFromHtml(html, req) {
+  const itineraries = [];
+  const $ = cheerio.load(req.data.html);
   const rows = $('.sortThisTable .row.rowsMarket1')
 
-  req.log('extracting flights from html');
+  console.log('extracting itineraries from html');
   if (rows.eq(0) && rows.eq(0).find('div.no-seats').length) return;
 
   rows.each((i,row) => {
-    req.log(`extracting flight #${i}`);
+    console.log(`extracting itinerary #${i}`);
     const $row = $(row);
-    $row.find('.depart label').remove()
-    $row.find('.depart span').remove()
-    $row.find('.arrive span').remove()
-    $row.find('.arrive label').remove()
-    const depTimeAmPm = $row.find('.depart sup').remove().text().trim();
-    const arrTimeAmPm = $row.find('.arrive sup').remove().text().trim();
-    const depTime = Utils.extractTime($row.find('.depart').text().trim(), depTimeAmPm);
-    const arrTime = Utils.extractTime($row.find('.arrive').text().trim(), arrTimeAmPm);
-    const airports = $row.find('.standardFare input.standardFareInput').attr('data-market').split(',').map(s => s.split('|'))
-    const flightNumbers = [];
-    const flight = {
-      cxr: req.cxr,
-      depApt: req.depApt,
-      depDate: req.depDate.format('YYYY-MM-DD'),
-      depTime: depTime,
-      arrApt: req.arrApt,
-      arrTime: arrTime,
-      arrDate: Utils.calculateArrDate(req.depDate.format('YYYY-MM-DD'), depTime, arrTime),
-      flightNumbers: flightNumbers,
-      flightIds: flightNumbers, // ToDo: remove this
-      numStops: extractNumStops($row.find('.stops a.stopsLink').text()),
-      stopApts: (airports.length > 1) ? airports.slice(1).map(a => a[0]) : [],
-      segments: [],
-    }
-
-    // extract segments
-    $row.find('.stops .popUpContent .flight-info-header').each((i,elem) => {
-      const $header = $(elem);
-      const $details = $header.parent().parent().next();
-      const lastSeg = flight.segments.length ? flight.segments[flight.segments.length-1] : null;
-
-      const segDepApt = airports[i][0];
-      const segDepTime = Utils.extractTime($details.find('.flight-info-body div').eq(1).text().trim());
-      const segDepDate = lastSeg ? Utils.calculateArrDate(lastSeg.arrDate, lastSeg.arrTime, segDepTime) : flight.depDate;
-
-      const segArrApt = airports[i][1];
-      const segArrTime = Utils.extractTime($details.find('.flight-info-body div').eq(4).text().trim());
-      const segArrDate = Utils.calculateArrDate(segDepDate, segDepTime, segArrTime);
-
-      const flightNumber = parseInt($header.find('.fi-header-text.text-right').text().trim().match(/(\d+)/)[1]);
-      const segment = {
-        cxr: req.cxr,
-        flightNumber: flightNumber,
-        flightId: flightNumber, // ToDo: remove this
-        depApt: segDepApt,
-        depDate: segDepDate,
-        depTime: segDepTime,
-        arrApt: segArrApt,
-        arrDate: segArrDate,
-        arrTime: segArrTime,
-      };
-      flightNumbers.push(flightNumber);
-      flight.segments.push(segment);
-    });
-    // extract price
-    flight.price = $row.find('.bareFare .standardFare .emPrice').first().text().trim().match(/[0-9\.]+/)[0] * 100
-
-    // add to flights array
-    flights.push(flight);
+    const price = extractCheapestPrice($row);
+    const legs = extractLegsFromRow($row, req);
+    if (price) itineraries.push(new Itinerary(legs, price));
   });
-  return flights;
+  return itineraries;
+}
+
+function extractLegsFromRow($row, req) {
+  const legs = [];
+  const segments = [];
+  const layovers = [];
+
+  // extract segments
+  const airports = $row.find('.standardFare input.standardFareInput').attr('data-market').split(',').map(s => s.split('|'))
+  $row.find('.stops .popUpContent .flight-info-header').each((i,elem) => {
+    const $header = cheerio(elem);
+    const $details = $header.parent().parent().next();
+    const lastSeg = segments.length ? segments[segments.length-1] : null;
+
+    const depAirportCode = airports[i][0];
+    const depTime = Utils.extractTime($details.find('.flight-info-body div').eq(1).text().trim());
+    const depDate = lastSeg ? Utils.calculateArrDate(lastSeg.arrDate, lastSeg.arrTime, depTime) : req.depDate.format('YYYY-MM-DD');
+
+    const arrAirportCode = airports[i][1];
+    const arrTime = Utils.extractTime($details.find('.flight-info-body div').eq(4).text().trim());
+    const arrDate = Utils.calculateArrDate(depDate, depTime, arrTime);
+
+    const flightNumber = parseInt($header.find('.fi-header-text.text-right').text().trim().match(/(\d+)/)[1]);
+
+    segments.push(new Segment({
+      carrier: 'NK',
+      flightNumber: flightNumber,
+      depAirportCode: depAirportCode,
+      depDate: depDate,
+      depTime: depTime,
+      arrAirportCode: arrAirportCode,
+      arrDate: arrDate,
+      arrTime: arrTime,
+      // durationMinutes: stop.legDuration, // TODO
+    }));
+    if (segments.length > 1) {
+      layovers.push(new Layover({ durationMinutes: 0 })) // TODO
+    }
+  });
+
+  legs.push(new Leg(segments, layovers));
+
+  return legs;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,4 +95,8 @@ function extractNumStops(text) {
     let matches = text.match(/([0-9])+\s+stop/i)
     return parseInt(matches[1])
   }
+}
+
+function extractCheapestPrice($row) {
+  return $row.find('.bareFare .standardFare .emPrice').first().text().trim().match(/[0-9\.]+/)[0] * 100
 }

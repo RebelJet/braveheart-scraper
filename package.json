@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "IS_DEBUG_MODE=true babel-node server.js"
+    "start": "IS_DEBUG_MODE=true node server.js"
   },
   "repository": {
     "type": "git",

@@ -21,7 +21,8 @@ module.exports = function parse(req) {
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;
         if (itinerary.legs[0].arrAirportCode !== req.arrApt) return;
-        itineraries.push(itinerary);
+
+        itineraries.push(itinerary)
       });
     })
   })
@@ -31,7 +32,7 @@ module.exports = function parse(req) {
 
 function extractItinerariesFromFile(file, req) {
   const itineraries = [];
-  const records = file.journeys[0].flights;
+  const records = file.itinerary;
   records.forEach(record => {
     const price = extractCheapestPrice(record);
     const legs = extractLegsFromRecord(record, req);
@@ -45,19 +46,19 @@ function extractLegsFromRecord(record, req) {
   const segments = [];
   const layovers = [];
 
-  record.legs.forEach(seg => {
-    const duration = seg.duration.split(':').map(i => parseInt(i))
-    const durationMinutes = (duration[0] * 60) + duration[1];
+  record.trip[0].flightSegment.forEach(seg => {
+    const depDateTime = moment(seg.schedDepartLocalTs, 'YYYY-MM-DDTHH:mm');
+    const arrDateTime = moment(seg.schedArrivalLocalTs, 'YYYY-MM-DDTHH:mm');
     segments.push(new Segment({
-      carrier: 'F9',
-      flightNumber: parseInt(seg.flightNumber),
-      depAirportCode: seg.departureStation,
-      depDate: moment(seg.departureDate).format('YYYY-MM-DD'),
-      depTime: moment(seg.departureDate).format('HH:mm'),
-      arrAirportCode: seg.arrivalStation,
-      arrDate: moment(seg.arrivalDate).format('YYYY-MM-DD'),
-      arrTime: moment(seg.arrivalDate).format('HH:mm'),
-      durationMinutes: durationMinutes,
+      carrier: 'DL',
+      flightNumber: parseInt(seg.marketingFlightNum),
+      depAirportCode: seg.originAirportCode,
+      depDate: depDateTime.format('YYYY-MM-DD'),
+      depTime: depDateTime.format('HH:mm'),
+      arrAirportCode: seg.destAirportCode,
+      arrDate: arrDateTime.format('YYYY-MM-DD'),
+      arrTime: arrDateTime.format('HH:mm'),
+      durationMinutes: (seg.totalAirTime.day * 1440) + (seg.totalAirTime.hour * 60) + seg.totalAirTime.minute,
     }));
     if (segments.length > 1) {
       layovers.push(new Layover({ durationMinutes: 0 })) // TODO
@@ -65,16 +66,22 @@ function extractLegsFromRecord(record, req) {
   })
 
   legs.push(new Leg(segments, layovers));
-  if (req.retDate) legs.push({
-    depAirportCode: legs[0].arrAirportCode,
-    depDate: req.retDate.format('YYYY-MM-DD'),
-    arrAirportCode: legs[0].depAirportCode,
-    requiresFetch: true
-  })
+  // if (req.retDate) legs.push({
+  //   depAirportCode: legs[0].arrAirportCode,
+  //   depDate: req.retDate.format('YYYY-MM-DD'),
+  //   arrAirportCode: legs[0].depAirportCode,
+  //   requiresFetch: true
+  // })
 
   return legs;
 }
 
-function extractCheapestPrice(flight) {
-  return parseInt((flight.discountDenFareFormatted || flight.standardFareFormatted).replace('$','')) * 100;
+function extractCheapestPrice(record) {
+  let price = 0;
+  record.fare.forEach(fare => {
+    if (fare.soldOut) return;
+    const p = fare.totalPrice.currency.amount;
+    if (!price || price > p) price = p;
+  });
+  return Math.round(price * 100);
 }

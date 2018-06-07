@@ -37,7 +37,7 @@ module.exports = function parse(req) {
 function extractItinerariesFromFile(file) {
   const itineraries = [];
 
-  file.data.forEach(tmpItin => {
+  file.data.get_flights.data.forEach(tmpItin => {
     const price = Math.round((tmpItin.conversion.EUR * 1.24) * 100)
     const legs = extractLegsFromTmpItinerary(tmpItin);
     if (legs.length) itineraries.push(new Itinerary(legs, price));
