@@ -98,5 +98,5 @@ function extractNumStops(text) {
 }
 
 function extractCheapestPrice($row) {
-  return Math.ceil($row.find('.bareFare .standardFare .emPrice').first().text().trim().match(/[0-9\.]+/)[0] * 100);
+  return Math.round($row.find('.bareFare .standardFare .emPrice').first().text().trim().match(/[0-9\.]+/)[0] * 100);
 }

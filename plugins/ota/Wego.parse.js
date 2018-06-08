@@ -103,5 +103,5 @@ function extractCheapestPrice(fares) {
     let p = fare.price.totalAmountUsd;
     if (!price || p < price) price = p;
   })
-  return Math.ceil(price * 100)
+  return Math.round(price * 100)
 }

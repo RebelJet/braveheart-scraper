@@ -106,11 +106,11 @@ function extractLegsFromTmpItinerary(tmpItin) {
 
 function extractPrice(tmpItin, isNewFormat) {
   if (!isNewFormat) {
-    return Math.ceil((tmpItin.conversion.EUR * 1.24) * 100)
+    return Math.round((tmpItin.conversion.EUR * 1.24) * 100)
   }
   let conversion = tmpItin.conversion[0];
   if (!conversion) return;
   let price = conversion.value;
   if (conversion.currency === 'EUR') price = price * 1.18; // TODO: dynamically load exchange rate
-  return Math.ceil(price * 100)
+  return Math.round(price * 100)
 }

@@ -76,5 +76,5 @@ function extractLegsFromRecord(record, req) {
 }
 
 function extractCheapestPrice(flight) {
-  return Math.ceil(parseInt((flight.discountDenFareFormatted || flight.standardFareFormatted).replace('$','')) * 100);
+  return Math.round(parseInt((flight.discountDenFareFormatted || flight.standardFareFormatted).replace('$','')) * 100);
 }

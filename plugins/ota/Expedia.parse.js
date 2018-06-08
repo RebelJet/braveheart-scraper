@@ -38,7 +38,7 @@ function extractItinerariesFromFile(file) {
   }, {});
 
   Object.values(file.content.offers).forEach(tmpOffer => {
-    const price = Math.ceil((tmpOffer.price.exactPrice) * 100);
+    const price = Math.round(tmpOffer.price.exactPrice * 100);
     const legs = tmpOffer.legIds.map(tmpLegId => {
       const tmpLeg = legsById[tmpLegId];
       return extractLegFromTmpLeg(tmpLeg);

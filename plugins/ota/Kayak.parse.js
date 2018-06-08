@@ -42,7 +42,7 @@ function extractItinerariesFromFile(file) {
     console.log(`PARSING ITINERARY ${i}`)
     const $tmpItin = cheerio(tmpItinerary);
     const priceSelector = '.resultInner .col-price .multibook-dropdown .above-button .price.option-text';
-    const price = Math.ceil(parseInt($tmpItin.find(priceSelector).text().trim().replace(/[^0-9.]+/, '')) * 100);
+    const price = Math.round(parseInt($tmpItin.find(priceSelector).text().trim().replace(/[^0-9.]+/, '')) * 100);
     if (!price) return;
 
     const legs = extractLegsFromTmpItinerary($tmpItin);
