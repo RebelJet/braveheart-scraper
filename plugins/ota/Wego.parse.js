@@ -37,12 +37,14 @@ function extractItinerariesFromFile(file) {
   }, {});
 
   const faresByTripId = file.fares.reduce((faresByTripId, fare) => {
-    return Object.assign(faresByTripId, { [fare.tripId]: fare })
+    faresByTripId[fare.tripId] = faresByTripId[fare.tripId] || [];
+    faresByTripId[fare.tripId].push(fare);
+    return faresByTripId;
   }, {});
 
   return file.trips.map(trip => {
-    const fare = faresByTripId[trip.id];
-    const price = Math.ceil((fare.price.amountPerAdult || fare.price.originalAmountUsd) * 100)
+    const fares = faresByTripId[trip.id];
+    const price = extractCheapestPrice(fares);
     const legs = trip.legIds.map((tmpLegId,i) => {
       const tmpLeg = legsById[tmpLegId];
       const depDate = file.search.legs[i].outboundDate;
@@ -93,4 +95,13 @@ function extractLegFromTmpLeg(tmpLeg, depDate) {
   })
 
   return new Leg(segments, layovers);
+}
+
+function extractCheapestPrice(fares) {
+  let price;
+  fares.forEach(fare => {
+    let p = fare.price.totalAmountUsd;
+    if (!price || p < price) price = p;
+  })
+  return Math.ceil(price * 100)
 }
