@@ -5,7 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const moment = require('moment');
 
-const filepath = path.resolve(__dirname, '../html/OTA-Wego-ATL-SEA-2018-06-21');
+const filepath = path.resolve(__dirname, '../html/CXR-UA-ATL-SFO-2018-06-21');
 const PluginBase = require('../lib/Plugins');
 
 async function run() {

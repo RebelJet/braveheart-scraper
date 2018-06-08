@@ -53,7 +53,7 @@ function extractLegsFromRecord(record, req) {
     Destination: record.Destination,
     DestinationDateTime: record.DestinationDateTime,
     TravelMinutes: record.TravelMinutes
-  }].concat(record.Connections);
+  }].concat(record.Connections || []);
 
   segs.forEach(seg => {
     const depDateTime = moment(seg.DepartDateTime, 'MM/DD/YYYY HH:mm');
