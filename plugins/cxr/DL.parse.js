@@ -83,5 +83,5 @@ function extractCheapestPrice(record) {
     const p = fare.totalPrice.currency.amount;
     if (!price || price > p) price = p;
   });
-  return Math.round(price * 100);
+  return Math.ceil(price * 100);
 }

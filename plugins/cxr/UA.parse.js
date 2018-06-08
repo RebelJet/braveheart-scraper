@@ -90,5 +90,5 @@ function extractCheapestPrice(record) {
   Object.values(record.PricesByColumn).forEach(p => {
     if (!price || p &&  p < price) price = p;
   });
-  return Math.round(price * 100);
+  return Math.ceil(price * 100);
 }

@@ -19,7 +19,7 @@ module.exports = function parse(req) {
     const files = filesByName[name];
     files.forEach((file,i) => {
       console.log(`PARSING ${name} :: ${i}`)
-      extractItinerariesFromFile(file).forEach(itinerary => {
+      extractItinerariesFromFile(file, name).forEach(itinerary => {
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;
         if (itinerary.legs[0].arrAirportCode !== req.arrApt) return;
@@ -31,11 +31,15 @@ module.exports = function parse(req) {
   return itineraries.sort((a,b) => a.price - b.price);
 }
 
-function extractItinerariesFromFile(file) {
+function extractItinerariesFromFile(file, name) {
   const itineraries = [];
+  const isNewFormat = name.includes('r-umbrella-app.skypicker.com/graphql') ? true : false
+  const tmpItins = isNewFormat ? file.data.get_flights.data : file.data;
 
-  file.data.get_flights.data.forEach(tmpItin => {
-    const price = extractPrice(tmpItin);
+  console.log('isNewFormat: ', isNewFormat, name)
+
+  tmpItins.forEach(tmpItin => {
+    const price = extractPrice(tmpItin, isNewFormat);
     const legs = extractLegsFromTmpItinerary(tmpItin);
     if (price && legs.length) itineraries.push(new Itinerary(legs, price));
   });
@@ -100,10 +104,13 @@ function extractLegsFromTmpItinerary(tmpItin) {
   return legs;
 }
 
-function extractPrice(tmpItin) {
+function extractPrice(tmpItin, isNewFormat) {
+  if (!isNewFormat) {
+    return Math.ceil((tmpItin.conversion.EUR * 1.24) * 100)
+  }
   let conversion = tmpItin.conversion[0];
   if (!conversion) return;
-  let price = tmpItin.conversion[0].value;
-  if (tmpItin.conversion.currency === 'EUR') price = price * 1.18; // TODO: dynamically load exchange rate
-  return Math.round(price * 100)
+  let price = conversion.value;
+  if (conversion.currency === 'EUR') price = price * 1.18; // TODO: dynamically load exchange rate
+  return Math.ceil(price * 100)
 }

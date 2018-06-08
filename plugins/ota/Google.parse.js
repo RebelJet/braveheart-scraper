@@ -60,7 +60,7 @@ function extractItinerariesFromData(data, req) {
     const rawPrice = flight[0][6];
     if (!rawPrice) return;
 
-    const price = parseInt(flight[0][6].replace(/[^0-9.]+/g, '')) * 100;
+    const price = Math.ceil(parseInt(flight[0][6].replace(/[^0-9.]+/g, '')) * 100);
     const legs = extractLegsFromTmpItinerary(flight[0], req);
     itineraries.push(new Itinerary(legs, price));
   });

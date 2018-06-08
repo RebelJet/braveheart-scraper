@@ -89,5 +89,5 @@ function extractCheapestPrice($row) {
     const p = parseInt(cheerio(row).text().trim());
     if (!price || price > p) price = p;
   });
-  return Math.round(price * 100);
+  return Math.ceil(price * 100);
 }

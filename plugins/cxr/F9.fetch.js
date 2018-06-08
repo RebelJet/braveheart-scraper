@@ -5,7 +5,7 @@ const UrlResults = 'https://booking.flyfrontier.com/Flight/Select';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = async function fetch(req, browser, addFile) {
+module.exports = async function fetch(req, browser, { addFile }) {
   const status = { isOnResultsPage: false }
 
   try {

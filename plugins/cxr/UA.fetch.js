@@ -8,7 +8,7 @@ const UrlResults = [
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = async function fetch(req, browser, addFile) {
+module.exports = async function fetch(req, browser, { addFile }) {
   const status = { isOnResultsPage: false, hasSavedFiles: false, flightDetailsLoaded: 0 }
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },

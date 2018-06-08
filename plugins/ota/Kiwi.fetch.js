@@ -7,7 +7,7 @@ const UrlResults = 'https://www.kiwi.com/us/search/';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = async function fetch(req, browser, addFile) {
+module.exports = async function fetch(req, browser, { addFile }) {
   const status = { isOnResultsPage: false };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },

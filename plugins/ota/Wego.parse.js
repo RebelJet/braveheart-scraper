@@ -42,7 +42,7 @@ function extractItinerariesFromFile(file) {
 
   return file.trips.map(trip => {
     const fare = faresByTripId[trip.id];
-    const price = Math.round((fare.price.amountPerAdult || fare.price.originalAmountUsd) * 100)
+    const price = Math.ceil((fare.price.amountPerAdult || fare.price.originalAmountUsd) * 100)
     const legs = trip.legIds.map((tmpLegId,i) => {
       const tmpLeg = legsById[tmpLegId];
       const depDate = file.search.legs[i].outboundDate;

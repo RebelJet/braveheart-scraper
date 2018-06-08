@@ -4,7 +4,7 @@ const UrlBase = 'https://www.wego.com/flights/searches';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = async function fetch(req, browser, addFile) {
+module.exports = async function fetch(req, browser, { addFile }) {
   const status = { isOnResultsPage: true };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },
