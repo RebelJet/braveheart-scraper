@@ -55,15 +55,16 @@ function extractItinerariesFromFile(file) {
 function extractLegsFromTmpItinerary($tmpItin) {
   const legs = [];
 
-  $tmpItin.find('.Flights-Results-LegInfo').each((legId, legInfo) => {
+  $tmpItin.find('.Flights-Results-ResultInfo').each((legId, legInfo) => {
     const segments = [];
     const layovers = [];
     const $legInfo = cheerio(legInfo);
-    const depAirportCode = extractAirportCode($legInfo.find('.col-field.depart .bottom').text(), $legInfo);
-    const arrAirportCode = extractAirportCode($legInfo.find('.col-field.return .bottom').text(), $legInfo);
+    const tmpAirportCodes = $legInfo.find('.section.duration .bottom').text().trim().split(/[^A-Z]+/).map(t => t.trim());
+    const depAirportCode = tmpAirportCodes[0]; //extractAirportCode($legInfo.find('.col-field.depart .bottom').text(), $legInfo);
+    const arrAirportCode = tmpAirportCodes[1]; // extractAirportCode($legInfo.find('.col-field.return .bottom').text(), $legInfo);
     const stopAirportCodes = extractStops($legInfo.find('.col-field.stops .bottom').text());
     const airportCodes = [depAirportCode, ...stopAirportCodes, arrAirportCode];
-    const $segmentRows = $tmpItin.find('.detailsContainer .Flights-Results-FlightLegDetails').eq(legId);
+    const $segmentRows = $tmpItin.find('.detailsContainer .Flights-Results-FlightResultDetails').eq(legId);
     $segmentRows.find('.segment-row').each((i, segmentRow) => {
       const $segmentRow = cheerio(segmentRow);
       const carrier = $segmentRow.find('.segment-details .icon-column img').attr('src').match(/airlines\/v\/([A-Z0-9]{2})/)[1];
