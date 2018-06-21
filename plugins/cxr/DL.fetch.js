@@ -31,7 +31,7 @@ module.exports = async function fetch(req, browser, { addFile }) {
     console.log('INSERTING depDate/retDate');
     await selectDate(page, '#input_departureDate_1', req.depDate, req.retDate)
 
-    await Utils.sleep(100);
+    await Utils.sleep(500);
     await page.blockImages();
 
     status.isOnResultsPage = true;
