@@ -19,12 +19,11 @@ module.exports = async function fetch(req, browser, { addFile }) {
       try {
         if (
           !document.querySelector('makalu-app') ||
-          !document.querySelector('makalu-app').shadowRoot.querySelector('iron-pages wego-flight-results') ||
-          !document.querySelector('makalu-app').shadowRoot.querySelector('iron-pages wego-flight-results').shadowRoot.querySelector('progress-bar')
+          !document.querySelector('makalu-app').shadowRoot.querySelector('#pages wego-flight-results')
         ) return false;
         console.log('CHECKING PROGRESS')
-        const progressElem = document.querySelector('makalu-app').shadowRoot.querySelector('iron-pages wego-flight-results').shadowRoot.querySelector('progress-bar');
-        return (progressElem.getAttribute('hidden') === '');
+        const progressElem = document.querySelector('makalu-app').shadowRoot.querySelector('#pages wego-flight-results').shadowRoot.querySelector('progress-bar');
+        return (progressElem && progressElem.getAttribute('hidden') === '');
       }catch(err) {
         console.log(err)
       }
