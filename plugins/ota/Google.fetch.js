@@ -17,12 +17,21 @@ module.exports = async function fetch(req, browser, { addFile }) {
 
     const page = await browser.loadPage(url, null);
     await Utils.sleep(1000);
-    status.hasSavedFiles = false;
-    await page.$eval('.gws-flights-results__dominated-toggle.gws-flights-results__collapsed', el => el ? el.click() : null);
     while (!status.hasSavedFiles) {
       await Utils.sleep(100);
     }
-    await Utils.sleep(5000);
+
+    status.hasSavedFiles = false;
+    const isLoadingMore = await page.evaluate(function() {
+      const el = document.querySelector('.gws-flights-results__dominated-toggle.gws-flights-results__collapsed');
+      if (el) el.click();
+      return !!el;
+    });
+
+    while (isLoadingMore && !status.hasSavedFiles) {
+      await Utils.sleep(100);
+    }
+    await Utils.sleep(2000);
     return await page.content();;
 
   } catch(err) {

@@ -20,6 +20,7 @@ module.exports = function parse(req) {
     files.forEach((file,i) => {
       console.log(`PARSING ${name} :: ${i}`)
       const data = extractDataFromFile(file);
+      if (!data) return;
       extractItinerariesFromData(data, req).forEach(itinerary => {
         if (itinerary.legs[0].depDate !== depDate) return;
         if (itinerary.legs[0].depAirportCode !== req.depApt) return;
@@ -34,6 +35,7 @@ module.exports = function parse(req) {
 }
 
 function extractDataFromFile(file) {
+  if (file._r.length < 3) return;
   const raw = {
     junk: file._r[0],
     junk: file._r[1],
