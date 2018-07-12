@@ -31,6 +31,7 @@ function extractItinerariesFromHtml(html, req) {
   const rows = $('ul.search-results-normal > li')
 
   rows.each((i,row) => {
+    i = parseInt(i);
     console.log(`extracting itinerary #${i}`);
     const $row = $(row);
     const price = extractCheapestPrice($row);
@@ -44,11 +45,11 @@ function extractLegsFromRow($row, i, req) {
   const legs = [];
   const segments = [];
   const layovers = [];
-
   const details = cheerio(req.data.filesByName['https-www-aa-com-booking-flights-choose-flights-ajax-flightDetails'][i].trim());
   const tabs = details.find('li.flight-details-tab')
   tabs.find('.flight-stops-index').remove()
   tabs.each((i,tab) => {
+    i = parseInt(i);
     const [ depAirportCode, arrAirportCode ] = cheerio(tab).text().trim().split('-').map(s => s.trim());
     const flightNumber = details.find('.flight-numbers').eq(i).text().match(/AA\s+(\d+)/)[1];
     const depDate = moment(details.find('.flight-date-info').eq(i).text().replace(/\s+/g,' ').trim(), 'dddd, MMMM D, YYYY').format('YYYY-MM-DD');
