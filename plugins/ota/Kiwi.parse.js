@@ -1,6 +1,7 @@
 const moment = require('moment-timezone');
 
 const Utils = require('../../lib/Utils');
+const Currency = require('../../lib/Currency');
 const Airports = require('../../lib/common/Airports');
 
 const Itinerary = require('../../lib/models/Itinerary');
@@ -35,8 +36,6 @@ function extractItinerariesFromFile(file, name) {
   const itineraries = [];
   const isNewFormat = name.includes('r-umbrella-app.skypicker.com/graphql') ? true : false
   const tmpItins = isNewFormat ? file.data.get_flights.data : file.data;
-
-  console.log('isNewFormat: ', isNewFormat, name)
 
   tmpItins.forEach(tmpItin => {
     const price = extractPrice(tmpItin, isNewFormat);
@@ -106,11 +105,11 @@ function extractLegsFromTmpItinerary(tmpItin) {
 
 function extractPrice(tmpItin, isNewFormat) {
   if (!isNewFormat) {
-    return Math.round((tmpItin.conversion.EUR * 1.24) * 100)
+    return Math.round(Currency.convert(tmpItin.conversion.EUR, 'EUR', 'USD') * 100)
   }
   let conversion = tmpItin.conversion[0];
   if (!conversion) return;
   let price = conversion.value;
-  if (conversion.currency === 'EUR') price = price * 1.18; // TODO: dynamically load exchange rate
+  if (conversion.currency === 'EUR') price = price * EuroToDollarExchangeRate; // TODO: dynamically load exchange rate
   return Math.round(price * 100)
 }

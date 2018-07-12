@@ -64,6 +64,7 @@ module.exports = async function fetch(req, browser, { addFile }) {
       return (loadingBarElem && loadingBarElem.className.includes('is-active')) ? false : true;
     }, { polling: 50, timeout: 60000 });
 
+    await Utils.sleep(2000);
     return await page.content()
 
   } catch(err) {
@@ -157,7 +158,7 @@ async function clearAptField(page, type) {
   await page.evaluate((type) => {
     return new Promise((resolve, reject) => {
       (function removeSelection() {
-        const elem = document.querySelector(`.SearchField.${type} .input-place-close`);
+        const elem = document.querySelector(`.SearchField.${type} .PickerPlaceInputPlace-close`);
         if (!elem) return resolve();
         elem.click();
         setTimeout(removeSelection, 100);
@@ -169,8 +170,8 @@ async function clearAptField(page, type) {
 async function insertAptCode(page, type, aptCode) {
   await clearAptField(page, type);
   await Utils.sleep(400);
-  await page.click(`input.input-${type}`);
-  await page.type(`input.input-${type}`, aptCode, { delay: 100 });
+  await page.click(`.SearchField.${type} .SearchPlaceField input`);
+  await page.type(`.SearchField.${type} .SearchPlaceField input`, aptCode, { delay: 100 });
   const optionsSelector = `.PlacePicker-content .PlacePicker-places .places-list .PlacePickerRow.clickable`;
   console.log('waiting for optionsSelector');
   await page.waitFor(optionsSelector);
