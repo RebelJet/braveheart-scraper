@@ -74,10 +74,20 @@ module.exports = async function fetch(req, browser, { addFile }) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
+const throwawayResponse = [
+  'https://sslwidget.criteo.com',
+  'https://logg.kiwi.com',
+  'https://loglady.skypicker.com/',
+  'https://kp1.forter.com',
+  'https://cdn0.forter.com',
+];
 
 const usableResponse = [
   'https://api.skypicker.com/flights',
-  'https://r-umbrella-app.skypicker.com/graphql'
+  'https://r-umbrella-app.skypicker.com/graphql',
+  'https://api.skypicker.com/umbrella/graphql?featureName=poll_umbrella',
+  'https://api.skypicker.com/umbrella/graphql?featureName=results',
+  'https://api.skypicker.com/umbrella/graphql?featureName=aggregateResults'
   // 'https://meta-searches.skypicker.com/search'
 ];
 
@@ -88,7 +98,10 @@ async function processFiles(response, addFile, status) {
   const url = response.url();
   const prefix = url.match(/[^?]+/)[0];
 
-  if (!['script','xhr'].includes(type)) return;
+  if (!['xhr'].includes(type)) return;
+  const isThrowawayFile = throwawayResponse.some(prefix => url.includes(prefix));
+  if (isThrowawayFile) return;
+
   const isUsableFile = usableResponse.some(prefix => url.includes(prefix));
   const body = await response.text();
   if (isUsableFile && body) {
@@ -99,7 +112,7 @@ async function processFiles(response, addFile, status) {
   } else if (!isUsableFile) {
     console.log('--------------------------------------------')
     console.log(`  - ${type} : ${url}`)
-    // console.log(body)
+    console.log(body)
   }
 }
 

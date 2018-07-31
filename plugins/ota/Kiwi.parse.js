@@ -34,7 +34,7 @@ module.exports = function parse(req) {
 
 function extractItinerariesFromFile(file, name) {
   const itineraries = [];
-  const isNewFormat = name.includes('r-umbrella-app.skypicker.com/graphql') ? true : false
+  const isNewFormat = name.includes('graphql') ? true : false
   const tmpItins = isNewFormat ? file.data.get_flights.data : file.data;
 
   tmpItins.forEach(tmpItin => {
@@ -110,6 +110,6 @@ function extractPrice(tmpItin, isNewFormat) {
   let conversion = tmpItin.conversion[0];
   if (!conversion) return;
   let price = conversion.value;
-  if (conversion.currency === 'EUR') price = price * EuroToDollarExchangeRate; // TODO: dynamically load exchange rate
+  if (conversion.currency === 'EUR') price = Currency.convert(price, 'EUR', 'USD');
   return Math.round(price * 100)
 }
