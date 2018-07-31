@@ -163,12 +163,11 @@ async function insertDate(page, dateValue, dateBox, dateInput) {
       return document.querySelector(dateInput).innerText;
     }, dateInput);
     await Utils.sleep(500);
-    await page.click(dateInput);
-    await page.keyboard.press('Enter');
-    await Utils.sleep(500);
     if (curValue === dateValue) break;
     console.log(`RETRYING ${dateInput}: `, dateValue, curValue);
   }
+  await page.click(dateInput);
+  await page.keyboard.press('Enter');
 }
 
 async function insertAptCode(page, type, aptCode, formId) {
