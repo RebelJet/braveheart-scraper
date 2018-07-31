@@ -26,65 +26,29 @@ module.exports = async function fetch(req, browser, { addFile }) {
   const switchOption = `#${switchId}-switch-option-${req.retDate ? '1' : '2'}`;
   await page.waitForSelector(switchOption, { visible: true })
   await page.click(switchOption);
-
-  // depAirportCode
-  console.log('INSERTING depAirportCode');
-  const depBox = `#${formId}-origin-airport-display`;
-  const depInput = `#${formId}-origin-airport`;
   await Utils.sleep(500);
-  await page.click(depBox);
-  await page.waitForSelector(depInput, { visible: true })
-  await page.click(depInput);
-  await page.evaluate(function(selector, value) {
-    document.querySelector(selector).value = value;
-  }, depInput, req.depApt)
-  await page.click(`#${formId}-origin-airport`);
-  await Utils.sleep(500);
-  await page.evaluate((formId, aptCode) => {
-    return new Promise((resolve, reject) => {
-      (function selectNode() {
-        const elem = document.querySelector(`#${formId}-origin-airport-smartbox-dropdown > ul li[data-apicode='${aptCode}']`)
-        if (!elem) return setTimeout(selectNode, 100);
-        elem.click();
-        resolve();
-      })();
-    })
-  }, formId, req.depApt);
-  console.log('FOUND arrAirportCode clickElem')
 
-  // arrAirportCode
-  console.log('INSERTING arrAirportCode');
-  const arrBox = `#${formId}-destination-airport-display`;
-  const arrInput = `#${formId}-destination-airport`;
-  await page.waitForSelector(arrInput, { visible: true })
-  await page.click(arrInput);
-  await page.evaluate(function(selector, value) {
-    document.querySelector(selector).value = value;
-  }, arrInput, req.arrApt)
-  const clickElem = `#${formId}-destination-airport-smartbox-dropdown > ul li[data-apicode='${req.arrApt}']`;
-  while (true) {
-    await Utils.sleep(100);
-    const isFound = await page.evaluate(sel => {
-      const elem = document.querySelector(sel)
-      return (elem && elem.offsetParent !== null);
-    }, clickElem);
-    if (isFound) break;
-  }
-  console.log('FOUND arrAirportCode clickElem')
-  await page.click(clickElem)
+  console.log('INSERTING depApt')
+  await insertAptCode(page, 'origin', req.depApt, formId);
+  await Utils.sleep(100);
 
-  // depDate
+  console.log('INSERTING depApt')
+  await insertAptCode(page, 'destination', req.arrApt, formId);
+  await Utils.sleep(100);
+
   console.log('INSERTING depDate');
   await insertDate(page, req.depDate, `#${formId}-dateRangeInput-display-start`, `#${formId}-depart-input`)
 
-  // retDate
   if (req.retDate) {
     console.log('INSERTING retDate');
     await insertDate(page, req.retDate, `#${formId}-dateRangeInput-display-end`, `#${formId}-return-input`)
   }
 
   // do not open comparison windows
-  await page.click(`button#${formId}-compareTo-noneLink`)
+  await page.evaluate(selector => {
+    const elem = document.querySelector(selector);
+    if (elem) elem.click();
+  }, `button#${formId}-compareTo-noneLink`);
 
   status.isOnResultsPage = true;
   console.log('IS LOADING RESULTS PAGE !!!!!!!!!!!')
@@ -141,7 +105,6 @@ const throwawayResponse = [
   'https://securepubads.g.doubleclick.net',
   'https://www.kayak.com/vs/flights/results/unknown/sra/adcollapse',
   'https://www.kayak.com/s/horizon/flights/results/FlightPricePredictionAction'
-
 ]
 
 const usableResponse = [
@@ -188,14 +151,14 @@ async function processFiles(response, addFile, status) {
 }
 
 async function insertDate(page, dateValue, dateBox, dateInput) {
-  await Utils.sleep(200);
+  await page.waitForSelector(dateBox, { visible: true })
   await page.click(dateBox);
   await page.waitForSelector(dateInput, { visible: true })
   await page.click(dateInput);
 
   dateValue = dateValue.format('MM/DD/YYYY');
   while (true) {
-    await page.type(dateInput, dateValue)
+    await page.type(dateInput, dateValue);
     const curValue = await page.evaluate(dateInput => {
       return document.querySelector(dateInput).innerText;
     }, dateInput);
@@ -206,4 +169,28 @@ async function insertDate(page, dateValue, dateBox, dateInput) {
     if (curValue === dateValue) break;
     console.log(`RETRYING ${dateInput}: `, dateValue, curValue);
   }
+}
+
+async function insertAptCode(page, type, aptCode, formId) {
+  const box = `#${formId}-${type}-airport-display`;
+  const input = `#${formId}-${type}-airport`;
+  await page.waitForSelector(box, { visible: true })
+  await page.click(box);
+  await page.waitForSelector(input, { visible: true })
+  await page.click(input);
+  await page.evaluate(function(selector, value) {
+    document.querySelector(selector).value = value;
+  }, input, aptCode)
+
+  const aptSelector = `#${formId}-${type}-airport-smartbox-dropdown > ul li[data-apicode='${aptCode}']`;
+  while (true) {
+    const isFound = await page.evaluate(selector => {
+      const elem = document.querySelector(selector)
+      return (elem && elem.offsetParent !== null);
+    }, aptSelector);
+    if (isFound) break;
+    await page.click(input);
+    await Utils.sleep(100);
+  }
+  await page.click(aptSelector)
 }
