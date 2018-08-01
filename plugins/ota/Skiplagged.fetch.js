@@ -5,7 +5,7 @@ const UrlBase = 'https://skiplagged.com/flights';
 ////////////////////////////////////////////////////////////////////////////////
 
 module.exports = async function fetch(req, browser, { addFile }) {
-  const status = { isOnResultsPage: true, hasSavedFiles: false };
+  const status = { isOnResultsPage: true, hasSavedFiles: false, isComplete: false };
   browser.config({
     async onResponse(res) { await processFiles(res, addFile, status) },
     waitUntil: 'domcontentloaded'
@@ -16,15 +16,11 @@ module.exports = async function fetch(req, browser, { addFile }) {
     const url = `${UrlBase}/${req.depApt}/${req.arrApt}/${dates.join('/')}`;
     const page = await browser.loadPage(url, null);
 
-    while (!status.hasSavedFiles) {
+    while (!status.isComplete) {
       await Utils.sleep(100);
     }
-    await page.waitForFunction(function () {
-      return !document.querySelector('.spinner').offsetParent
-    }, { polling: 50, timeout: 60000 });
 
     console.log('DONE')
-
     return await page.content();
 
   } catch(err) {
@@ -60,6 +56,7 @@ async function processFiles(response, addFile, status) {
     const content = JSON.parse(body);
     addFile(prefix, content);
     status.hasSavedFiles = true;
+    if (!content.incomplete) status.isComplete = true;
     // console.log('--------------------------------------------')
     // console.log(`  - ${type} : ${url}`)
   // } else if (!isUsableFile && status.isOnResultsPage) {
