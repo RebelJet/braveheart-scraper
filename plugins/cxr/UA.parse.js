@@ -75,12 +75,6 @@ function extractLegsFromRecord(record, req) {
   })
 
   legs.push(new Leg(segments, layovers));
-  // if (req.retDate) legs.push({
-  //   depAirportCode: legs[0].arrAirportCode,
-  //   depDate: req.retDate.format('YYYY-MM-DD'),
-  //   arrAirportCode: legs[0].depAirportCode,
-  //   requiresFetch: true
-  // })
 
   return legs;
 }
