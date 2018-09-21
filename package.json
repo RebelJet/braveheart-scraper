@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "API for RebelJet Scraper",
   "author": "Caleb Clark",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "start": "IS_DEBUG_MODE=true node server.js"
